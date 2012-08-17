@@ -1,0 +1,4 @@
+name: FloatingIslands
+main: me.tobi.FloatingIslands.FloatingIslands
+version: 0.1
+load: STARTUP

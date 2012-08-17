@@ -1,0 +1,4 @@
+max-gen-height: 72
+min-gen-height: 56
+spawn-height: 64
+island-gen-probability: 0.3
