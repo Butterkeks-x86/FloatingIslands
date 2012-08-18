@@ -1,6 +1,5 @@
 package me.tobi.FloatingIslands.Listeners;
 
-import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
@@ -19,8 +18,7 @@ public class PlayerJoinListener implements Listener {
 	@EventHandler
 	public void onPlayerJoin(PlayerJoinEvent pjevt){
 		Player player=pjevt.getPlayer();
-		if(!player.hasPlayedBefore()){ //if first join -> teleport to exact spawn
-			player.teleport(player.getWorld().getSpawnLocation());
+		if(!player.hasPlayedBefore()){
 			player.getInventory().addItem(new ItemStack(Material.ICE, 1));
 			player.getInventory().addItem(new ItemStack(Material.LAVA_BUCKET, 1));
 		}
