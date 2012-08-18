@@ -42,7 +42,7 @@ public class FloatingIslandsChunkPopulator extends BlockPopulator {
 		
 		if(startBlock.getType()==Material.GRASS){
 			/*no biome switch statement for debugging purposes; TODO: alter*/
-			placeJungleObjects(startBlock);
+			placeTaigaObjects(startBlock);
 		}
 		else if(startBlock.getType()==Material.SAND){
 			placeDesertObjects(startBlock);
@@ -183,8 +183,29 @@ public class FloatingIslandsChunkPopulator extends BlockPopulator {
 		}
 	}
 
-	private void placeTaigaObjects() {
-		//TODO
+	private void placeTaigaObjects(Block startBlock) {
+		for(int x=0; x<3; x++){
+			for(int z=0; z<3; z++){
+				int r=ran.nextInt(1000);
+				/*since low light places for mushrooms are rare, try them every time*/
+				if(startBlock.getRelative(x, 1, z).getLightLevel()<13){
+					if(r<300){
+						startBlock.getRelative(x, 1, z)
+							.setType(Material.RED_MUSHROOM);
+					}
+					else startBlock.getRelative(x, 1, z)
+						.setType(Material.BROWN_MUSHROOM);
+				}
+				if(r<100){ //spruce tree
+					world.generateTree(
+							startBlock.getRelative(x, 1, z).getLocation(),
+							TreeType.REDWOOD);
+				}
+				else if(r<200){
+					startBlock.getRelative(x, 1, z).setType(Material.PUMPKIN);
+				}
+			}
+		}
 	}
 
 	private void placeForestObjects() {
