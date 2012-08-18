@@ -90,8 +90,9 @@ public class FloatingIslandsChunkGenerator extends ChunkGenerator {
 	
 	private void generateSandIsland(byte[][] chunk, int height, Random ran){
 		StructureGenerator sg=new StructureGenerator(chunk, ran);
-		//TODO: create sand island randomly, like dirt island
-		sg.generateLayers(0, height, 0, 3, 3, (byte)Material.SAND.getId());
+		int x=ran.nextInt(14);
+		int z=ran.nextInt(14);
+		sg.generateLayers(x, height, z, 3, 3, (byte)Material.SAND.getId());
 	}
 	
 	private void generateDirtIsland(byte[][] chunk, int height, Random ran){
