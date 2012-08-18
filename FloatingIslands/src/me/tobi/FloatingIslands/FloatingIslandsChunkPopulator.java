@@ -1,7 +1,6 @@
 package me.tobi.FloatingIslands;
 
 import java.util.Random;
-import java.util.logging.Logger;
 
 import org.bukkit.Chunk;
 import org.bukkit.Material;
@@ -10,9 +9,6 @@ import org.bukkit.World;
 import org.bukkit.block.Biome;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
-import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.generator.BlockPopulator;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -41,29 +37,26 @@ public class FloatingIslandsChunkPopulator extends BlockPopulator {
 		Block startBlock=getFirstSolidBlockInChunk();
 		
 		if(startBlock.getType()==Material.GRASS){
-			/*no biome switch statement for debugging purposes; TODO: alter*/
-			placeForestObjects(startBlock);
+			Biome biome=world.getBiome(startBlock.getX(), startBlock.getZ());
+			switch(biome){
+			case FOREST: placeForestObjects(startBlock); break;
+			case FOREST_HILLS: placeForestObjects(startBlock); break;
+			case TAIGA: placeTaigaObjects(startBlock); break;
+			case TAIGA_HILLS: placeTaigaObjects(startBlock); break;
+			case PLAINS: placePlainsObjects(startBlock); break;
+			case JUNGLE: placeJungleObjects(startBlock); break;
+			case JUNGLE_HILLS: placeJungleObjects(startBlock); break;
+			case SWAMPLAND: placeSwampObjects(startBlock); break;
+			case ICE_PLAINS: placeIceBiomeObjects(startBlock); break;
+			case ICE_MOUNTAINS: placeIceBiomeObjects(startBlock); break;
+			case EXTREME_HILLS:break; //TODO: unimplemented
+			case SMALL_MOUNTAINS: break; //TOD: unimplemented
+			default: break; //ignore other stuff like mushroom islands...
+			}
 		}
 		else if(startBlock.getType()==Material.SAND){
 			placeDesertObjects(startBlock);
 		}
-		
-//		Biome biome=world.getBiome(chunk.getX()*16, chunk.getZ()+16);
-//		switch(biome){
-//		case DESERT: placeDesertObjects(); break;
-//		case DESERT_HILLS: placeDesertObjects(); break;
-//		case FOREST: placeForestObjects(); break;
-//		case FOREST_HILLS: placeForestObjects(); break;
-//		case TAIGA: placeTaigaObjects(); break;
-//		case TAIGA_HILLS: placeTaigaObjects(); break;
-//		case PLAINS: placePlainsObjects(); break;
-//		case JUNGLE: placeJungleObjects(); break;
-//		case JUNGLE_HILLS: placeJungleObjects(); break;
-//		case SWAMPLAND: placeSwampObjects(); break;
-//		case ICE_PLAINS: placeIcePlainsObjects(); break;
-//		default: break;
-//		}
-		
 	}
 	
 	/**
@@ -125,7 +118,7 @@ public class FloatingIslandsChunkPopulator extends BlockPopulator {
 	 * Modifies a island according to the ice plains biome
 	 * @param startBlock The first block of the island
 	 */
-	private void placeIcePlainsObjects(Block startBlock) {
+	private void placeIceBiomeObjects(Block startBlock) {
 		for(int x=0; x<3; x++){
 			for(int z=0; z<3; z++){
 				int r=ran.nextInt(1000);
@@ -265,26 +258,6 @@ public class FloatingIslandsChunkPopulator extends BlockPopulator {
 				}
 			}
 		}
-	}
-	
-	private Block getAdjacentBlockOfType(Block block, Material type){
-		Block result=block.getRelative(BlockFace.NORTH);
-		if(result.getType()!=type){
-			result=block.getRelative(BlockFace.EAST);
-			if(result.getType()!=type){
-				result=block.getRelative(BlockFace.SOUTH);
-				if(result.getType()!=type){
-					result=block.getRelative(BlockFace.WEST);
-					if(result.getType()!=type){
-						return null;
-					}
-					else return result;
-				}
-				else return result;
-			}
-			else return result;
-		}
-		else return result;
 	}
 	
 	private Block getFirstSolidBlockInChunk(){
