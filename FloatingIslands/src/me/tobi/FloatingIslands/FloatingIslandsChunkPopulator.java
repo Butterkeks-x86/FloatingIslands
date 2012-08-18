@@ -14,12 +14,20 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.generator.BlockPopulator;
+import org.bukkit.plugin.java.JavaPlugin;
 
 public class FloatingIslandsChunkPopulator extends BlockPopulator {
 	
 	private World world;
 	private Chunk chunk;
 	private Random ran;
+	private int maxGenHeight=127;
+	private int minGenHeight=0;
+	
+	public FloatingIslandsChunkPopulator(JavaPlugin parent){
+		maxGenHeight=parent.getConfig().getInt("max-gen-height");
+		minGenHeight=parent.getConfig().getInt("min-gen-height");
+	}
 	
 	@Override
 	public void populate(World world, Random ran, Chunk chunk){
@@ -30,6 +38,16 @@ public class FloatingIslandsChunkPopulator extends BlockPopulator {
 	}
 	
 	private void placeObjects(){
+		Block startBlock=getFirstSolidBlockInChunk();
+		
+		if(startBlock.getType()==Material.GRASS){
+			/*no biome switch statement for debugging purposes; TODO: alter*/
+			placeJungleObjects(startBlock);
+		}
+		else if(startBlock.getType()==Material.SAND){
+			placeDesertObjects(startBlock);
+		}
+		
 //		Biome biome=world.getBiome(chunk.getX()*16, chunk.getZ()+16);
 //		switch(biome){
 //		case DESERT: placeDesertObjects(); break;
@@ -45,164 +63,155 @@ public class FloatingIslandsChunkPopulator extends BlockPopulator {
 //		case ICE_PLAINS: placeIcePlainsObjects(); break;
 //		default: break;
 //		}
-		placeJungleObjects();
+		
 	}
-
-	private void placeSwampObjects() {
-		int y=getHighestChunkBlockY()+1;
-		if(chunk.getBlock(0, y-1, 0).getType()!=Material.GRASS) return;
-		//TODO: ignore spawn island
-		Random ran=new Random();
-		for(int x=0; x<3; x++){
-			for(int z=0; z<2; z++){
-				int r=ran.nextInt(100);
-				if(r<15){
-					changeChunkBlockAt(x,y-1,z, Material.WATER, 0);
-					changeChunkBlockAt(x,y,z, Material.WATER_LILY, 0);
-				}
-				else if(r<35){
-					changeChunkBlockAt(x,y,z, Material.BROWN_MUSHROOM, 0);
-				}
-				else if(r<55){
-					changeChunkBlockAt(x,y,z, Material.RED_MUSHROOM, 0);
-				}
-				else{}
-			}
-		}
-		if(ran.nextInt()<50){
-			world.generateTree(chunk.getBlock(2,y,2).getLocation(),
-					TreeType.SWAMP);
-		}
-	}
-
-	private void placePlainsObjects() {
-		int y=getHighestChunkBlockY()+1;
-		if(chunk.getBlock(0, y-1, 0).getType()!=Material.GRASS) return;
-		//TODO: ignore spawn island
-		Random ran=new Random();
+	
+	/**
+	 * Places swamp objects on an island
+	 * @param startBlock The first block of the island to operate on
+	 */
+	private void placeSwampObjects(Block startBlock) {
 		for(int x=0; x<3; x++){
 			for(int z=0; z<3; z++){
-				int r=ran.nextInt(100);
-				if(r<40){
-					changeChunkBlockAt(x,y,z, Material.LONG_GRASS, 0);
+				int r=ran.nextInt(1000);
+				if(r<100){ //water with lily pad
+					startBlock.getRelative(x, 0, z).setType(Material.WATER);
+					startBlock.getRelative(x, 1, z).setType(Material.WATER_LILY);
 				}
-				else if(r<55){
-					changeChunkBlockAt(x,y,z, Material.YELLOW_FLOWER, 0);
+				else if(r<300){ //red mushroom
+					startBlock.getRelative(x, 1, z).setType(Material.RED_MUSHROOM);
 				}
-				else if(r<70){
-					changeChunkBlockAt(x,y,z, Material.RED_ROSE, 0);
+				else if(r<500){ //brown mushroom
+					startBlock.getRelative(x, 1, z).setType(Material.BROWN_MUSHROOM);
 				}
-				else{}
+				else if(r<600){ //tree
+					world.generateTree(
+							startBlock.getRelative(x, 1, z).getLocation(),
+							TreeType.SWAMP);
+				}
 			}
 		}
 	}
-
-	private void placeIcePlainsObjects() {
-		int y=getHighestChunkBlockY()+1;
-		if(chunk.getBlock(0, y-1, 0).getType()!=Material.GRASS) return;
-		//TODO: ignore spawn island
-		Random ran=new Random();
+	
+	/**
+	 * Modifies a island according to the plains biome
+	 * @param startBlock The blcok where the island starts
+	 */
+	private void placePlainsObjects(Block startBlock) {
 		for(int x=0; x<3; x++){
 			for(int z=0; z<3; z++){
-				int r=ran.nextInt(100);
-				if(r<10){
-					changeChunkBlockAt(x,y,z, Material.LONG_GRASS, 1);
+				int r=ran.nextInt(1000);
+				if(r<200){ //yellow flower
+					startBlock.getRelative(x, 1, z).setType(Material.YELLOW_FLOWER);
 				}
-				else if(r<20){
-					changeChunkBlockAt(x,y-1,z, Material.ICE, 0);
+				else if(r<400){ //red rose
+					startBlock.getRelative(x, 1, z).setType(Material.RED_ROSE);
 				}
-				else{
-					changeChunkBlockAt(x,y,z, Material.SNOW, 0);
+				else{ //tall grass
+					startBlock.getRelative(x, 1, z).setType(Material.LONG_GRASS);
+					startBlock.getRelative(x, 1, z).setData((byte)1);
+				}
+			}
+		}
+	}
+	
+	/**
+	 * Modifies a island according to the ice plains biome
+	 * @param startBlock The first block of the island
+	 */
+	private void placeIcePlainsObjects(Block startBlock) {
+		for(int x=0; x<3; x++){
+			for(int z=0; z<3; z++){
+				int r=ran.nextInt(1000);
+				if(r<100){ //ice block
+					startBlock.getRelative(x, 0, z).setType(Material.ICE);
+				}
+				else if(r<300){ //tall grass
+					startBlock.getRelative(x, 1, z).setType(Material.LONG_GRASS);
+					startBlock.getRelative(x, 1, z).setData((byte)1);
+				}
+				else{ //layer of snow
+					startBlock.getRelative(x, 1, z).setType(Material.SNOW);
 				}
 			}
 		}
 	}
 
-	private void placeJungleObjects() {
-		for(int x=0; x<16; x++){
-			for(int z=0; z<16; z++){
-				Block block=getHighestChunkBlockYAt(x,z);
-				if(block.getType()==Material.GRASS){
-					int r=ran.nextInt();
-					if(r<20){ //jungle treee
-						world.generateTree(
-								block.getRelative(BlockFace.UP).getLocation(),
-								TreeType.SMALL_JUNGLE);
+	private void placeJungleObjects(Block startBlock) {
+		for(int x=0; x<3; x++){
+			for(int z=0; z<3; z++){
+				int r=ran.nextInt(1000);
+				if(r<100){ //small jungle tree with coca bean
+					/*if we've set a adjacent tree before, forget about it*/
+					if(x>0 && startBlock.getRelative(x-1, 1, z)
+							.getType()==Material.LOG){
+						continue;
 					}
-					else if(r<40){ //reeds at water source block
-						Block neighbour=getAdjacentBlockOfType(block, Material.GRASS);
-						if(neighbour!=null){
-							neighbour.getRelative(BlockFace.UP).setType(Material.AIR);
-							neighbour.setType(Material.WATER);
-							block.getRelative(BlockFace.UP)
-								.setType(Material.SUGAR_CANE_BLOCK);
-						}
+					if(z>0 && startBlock.getRelative(x, 1, z-1)
+							.getType()==Material.LOG){
+						continue;
 					}
-					else if(r<60){ //tall grass
-						block.getRelative(BlockFace.UP).setType(Material.LONG_GRASS);
+					world.generateTree(
+							startBlock.getRelative(x, 1, z).getLocation(),
+							TreeType.SMALL_JUNGLE);
+					Block log=startBlock.getRelative(x-1, 3, z);
+					if(log.getType()==Material.AIR){
+						log.setType(Material.COCOA);
+						log.setData((byte)3); //for cocoa direction
 					}
-					else{}
+				}
+				/* reeds at water source block:
+				 * only look for a adjacent block "behind" and ensure that
+				 * this one is still on the island*/
+				else if(r<250 && x>0){
+					Block adjacent=startBlock.getRelative(x-1, 0, z);
+					if(adjacent.getRelative(BlockFace.UP).getType()==Material.AIR){
+						adjacent.setType(Material.WATER);
+						startBlock.getRelative(x, 1, z)
+							.setType(Material.SUGAR_CANE_BLOCK);
+					}
+				}
+				else if(r<400 && z>0){
+					Block adjacent=startBlock.getRelative(x, 0, z-1);
+					if(adjacent.getRelative(BlockFace.UP).getType()==Material.AIR){
+						adjacent.setType(Material.WATER);
+						startBlock.getRelative(x, 1, z)
+							.setType(Material.SUGAR_CANE_BLOCK);
+					}
 				}
 			}
 		}
 	}
 
 	private void placeTaigaObjects() {
-		// TODO Auto-generated method stub
-		
+		//TODO
 	}
 
 	private void placeForestObjects() {
-		// TODO Auto-generated method stub
-		
-	}
-
-	private void placeDesertObjects() {
-		int y=getHighestChunkBlockY()+1;
-		if(chunk.getBlock(0, y-1, 0).getType()!=Material.SAND) return;
-		//TODO: ignore spawn island
-		Random ran=new Random();
-		for(int x=0; x<3; x++){
-			for(int z=0; z<3; z++){
-				int r=ran.nextInt(100);
-				if(r<10){
-					changeChunkBlockAt(x,y,z, Material.LONG_GRASS, 0);
-				}
-				else if(r<25){
-					changeChunkBlockAt(x-1,y-1,z, Material.WATER, 0);
-					changeChunkBlockAt(x,y,z, Material.SUGAR_CANE_BLOCK, 0);
-				}
-				else if(r<40){
-					changeChunkBlockAt(x,y,z, Material.CACTUS, 0);
-				}
-				else{}
-			}
-		}
-	}
-	
-	private int getHighestChunkBlockY(){
-		Block highest=chunk.getBlock(0, 127, 0);
-		while(highest.getType()==Material.AIR && highest.getY()>0){
-			highest=highest.getRelative(0, -1, 0);
-		}
-		int y=highest.getY();
-		assert(y>=0);
-		assert(y<128);
-		return y;
+		//TODO
 	}
 	
 	/**
-	 * Returns the highest non-air block at the position x,z (relative chunk)
-	 * @param x 0...15
-	 * @param z 0...15
-	 * @return The highest non-ait block or the lowest air block, if none found
+	 * Modifies island at given start position according to desert biome
+	 * @param startBlock The first block of the island
 	 */
-	private Block getHighestChunkBlockYAt(int x, int z){
-		Block highest=chunk.getBlock(x, 127, z);
-		while(highest.getType()==Material.AIR && highest.getY()>0){
-			highest=highest.getRelative(0, -1, 0);
+	private void placeDesertObjects(Block startBlock) {
+		for(int x=0; x<3; x++){
+			for(int z=0; z<3; z++){
+				int r=ran.nextInt(1000);
+				if(r<100){
+					startBlock.getRelative(x, 1, z).setType(Material.CACTUS);
+					/*remove surrounding blocks since cacti need this space*/
+					startBlock.getRelative(x-1, 1, z).setType(Material.AIR);
+					startBlock.getRelative(x+1, 1, z).setType(Material.AIR);
+					startBlock.getRelative(x, 1, z-1).setType(Material.AIR);
+					startBlock.getRelative(x, 1, z+1).setType(Material.AIR);
+				}
+				else if(r<400){
+					startBlock.getRelative(x, 1, z).setType(Material.LONG_GRASS);
+				}
+			}
 		}
-		return highest;
 	}
 	
 	private Block getAdjacentBlockOfType(Block block, Material type){
@@ -225,10 +234,18 @@ public class FloatingIslandsChunkPopulator extends BlockPopulator {
 		else return result;
 	}
 	
-	private void changeChunkBlockAt(int x, int y, int z, Material newType,
-			int newData){
-		Block b=chunk.getBlock(x, y, z);
-		b.setType(newType);
-		b.setData((byte)newData);
+	private Block getFirstSolidBlockInChunk(){
+		Block retBlock=null;
+		for(int x=0; x<16; x++){
+			for(int z=0; z<16; z++){
+				retBlock=chunk.getBlock(x, maxGenHeight, z);
+				while(retBlock.getType()==Material.AIR
+						&& retBlock.getY()>minGenHeight){
+					retBlock=retBlock.getRelative(BlockFace.DOWN);
+				}
+				if(retBlock.getType()!=Material.AIR) return retBlock;
+			}
+		}
+		return retBlock;
 	}
 }
