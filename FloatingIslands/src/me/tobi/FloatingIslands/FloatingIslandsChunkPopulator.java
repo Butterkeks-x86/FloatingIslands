@@ -42,7 +42,7 @@ public class FloatingIslandsChunkPopulator extends BlockPopulator {
 		
 		if(startBlock.getType()==Material.GRASS){
 			/*no biome switch statement for debugging purposes; TODO: alter*/
-			placeSwampObjects(startBlock);
+			placeForestObjects(startBlock);
 		}
 		else if(startBlock.getType()==Material.SAND){
 			placeDesertObjects(startBlock);
@@ -217,8 +217,31 @@ public class FloatingIslandsChunkPopulator extends BlockPopulator {
 		}
 	}
 
-	private void placeForestObjects() {
-		//TODO
+	private void placeForestObjects(Block startBlock) {
+		for(int x=0; x<3; x++){
+			for(int z=0; z<3; z++){
+				int r=ran.nextInt(1000);
+				if(r<50){
+					world.generateTree(
+							startBlock.getRelative(x, 1, z).getLocation(),
+							TreeType.BIRCH);
+				}
+				else if(r<100){
+					world.generateTree(
+							startBlock.getRelative(x, 1, z).getLocation(),
+							TreeType.TREE);
+				}
+				if(r<125){
+					world.generateTree(
+							startBlock.getRelative(x, 1, z).getLocation(),
+							TreeType.BIG_TREE);
+				}
+				else if(r<500){
+					startBlock.getRelative(x, 1, z).setType(Material.LONG_GRASS);
+					startBlock.getRelative(x, 1, z).setData((byte)1);
+				}
+			}
+		}
 	}
 	
 	/**
