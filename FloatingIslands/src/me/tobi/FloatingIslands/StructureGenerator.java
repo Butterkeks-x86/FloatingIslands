@@ -36,6 +36,7 @@ public class StructureGenerator {
 	
 	public static boolean generateLayerRandomReplace(int xs, int ys, int zs, 
 			int size, byte matId, byte repId){
+		//TODO
 		return true;
 	}
 	
@@ -57,44 +58,6 @@ public class StructureGenerator {
 			generateLayer(xs, y, zs, size, matId);
 		}
 		return true;
-	}
-	
-	public boolean generateStem(int xs, int ys, int zs, int length, byte matId){
-		assert ys>=0;
-		assert ys+length<=256;
-		for(int y=ys; y<ys+length; y++){
-			setBlock(xs, y, zs, matId);
-		}
-		return true;
-	}
-	
-	/**
-	 * Generates an ordinary tree, six blocks high
-	 * @param xs
-	 * @param ys Height of the first log block
-	 * @param zs
-	 * @param logId Material id of the logs
-	 * @param leaveId Material id of the leaves
-	 * @return True if generation was successful
-	 */
-	public boolean generateNormalTree(int xs, int ys, int zs, byte logId, 
-			byte leaveId){
-		assert ys>=0;
-		assert ys+6<=256;
-		boolean ret=generateLayer(xs-2, ys+3, zs-2, 5, leaveId); //first leave layer
-		for(int x=xs-2; x<xs+3; x++){ //second leave layer
-			for(int z=zs-2; z<zs+3; z++){
-				if((z==zs-2 || z==xs+2) && (x==zs-2 || x==zs+2)) continue;
-				setBlock(x, ys+4, z, leaveId);
-			}
-		}
-		setBlock(xs+1, ys+5, zs, leaveId); //top leaves
-		setBlock(xs, ys+5, zs+1, leaveId);
-		setBlock(xs, ys+5, zs-1, leaveId);
-		setBlock(xs, ys+5, zs, leaveId);
-		setBlock(xs-1, ys+5, zs, leaveId);
-		generateStem(xs, ys, zs, 5, logId);
-		return ret;
 	}
 	
 	public void setBlock(int x, int y, int z, byte blkid) {
