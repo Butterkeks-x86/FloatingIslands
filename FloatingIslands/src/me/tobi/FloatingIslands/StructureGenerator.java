@@ -34,9 +34,24 @@ public class StructureGenerator {
 		return true;
 	}
 	
-	public static boolean generateLayerRandomReplace(int xs, int ys, int zs, 
+	public boolean generateLayerRandomReplace(int xs, int ys, int zs, 
 			int size, byte matId, byte repId){
-		//TODO
+		for(int x=xs; x<xs+size; x++){
+			for(int z=zs; z<zs+size; z++){
+				if(random.nextInt(100)<20){
+					setBlock(x, ys, z, repId);
+				}
+				else setBlock(x, ys, z, matId);
+			}
+		}
+		return true;
+	}
+	
+	public boolean generateLayersRandomReplace(int xs, int ys, int zs,
+			int size, int layerCount, byte matId, byte repId){
+		for(int y=ys-layerCount+1; y<=ys; y++){
+			generateLayerRandomReplace(xs, y, zs, size, matId, repId);
+		}
 		return true;
 	}
 	

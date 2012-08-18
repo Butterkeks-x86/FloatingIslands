@@ -101,11 +101,32 @@ public class FloatingIslandsChunkGenerator extends ChunkGenerator {
 		if(bio==Biome.DESERT || bio==Biome.DESERT_HILLS){
 			generateSandIsland(chunk, height, ran);
 		}
+		else if(bio==Biome.FOREST_HILLS || bio==Biome.TAIGA_HILLS
+				|| bio==Biome.JUNGLE_HILLS || bio==Biome.ICE_MOUNTAINS
+				|| bio==Biome.SMALL_MOUNTAINS || bio==Biome.EXTREME_HILLS){
+			generateDirtIslandWithOres(chunk, height, ran);
+		}
 		else{
 			generateDirtIsland(chunk, height, ran);
 		}
 	}
 	
+	private void generateDirtIslandWithOres(byte[][] chunk, int height,
+			Random ran) {
+		StructureGenerator sg=new StructureGenerator(chunk, ran);
+		int x=ran.nextInt(14);
+		int z=ran.nextInt(14);
+		if(z<7){
+			sg.generateLayersRandomReplace(x, height-1, z, 3, 2,
+					(byte)Material.DIRT.getId(), (byte)Material.IRON_ORE.getId());
+		}
+		else{
+			sg.generateLayersRandomReplace(x, height-1, z, 3, 2,
+					(byte)Material.DIRT.getId(), (byte)Material.COAL_ORE.getId());
+		}
+		sg.generateLayer(x, height, z, 3, (byte)Material.GRASS.getId());
+	}
+
 	private void generateSandIsland(byte[][] chunk, int height, Random ran){
 		StructureGenerator sg=new StructureGenerator(chunk, ran);
 		int x=ran.nextInt(14);
