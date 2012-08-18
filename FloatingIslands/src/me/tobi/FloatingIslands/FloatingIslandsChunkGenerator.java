@@ -8,6 +8,7 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Biome;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.generator.BlockPopulator;
 import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -70,11 +71,28 @@ public class FloatingIslandsChunkGenerator extends ChunkGenerator {
 		list.add(new FloatingIslandsChunkPopulator(parent));
 		return list;
 	}
-
+	
+	/* Some kind useless, since world attempts to few spawns to
+	 * have a hight probability of targeting a usable spawn place
+	 * (non-Javadoc)
+	 * @see org.bukkit.generator.ChunkGenerator#canSpawn(org.bukkit.World, int, int)
+	 */
 	@Override
 	public boolean canSpawn(World world, int x, int z){
-		Block highest=world.getBlockAt(x, world.getHighestBlockYAt(x, z), z);
-		if(highest.getType()==Material.GRASS) return true;
+		int maxGenHeight=parent.getConfig().getInt("max-gen-height");
+		int minGenHeight=parent.getConfig().getInt("min-gen-height");
+		Block block=world.getBlockAt(x, maxGenHeight, z);
+		while(block.getType()!=Material.GRASS && block.getY()>minGenHeight){
+			block=block.getRelative(BlockFace.DOWN);
+		}
+		if(block.getType()==Material.GRASS){
+			if(block.getRelative(0, 1, 0).getType()==Material.AIR
+					&& block.getRelative(0, 2, 0).getType()==Material.AIR
+					&& block.getRelative(0, 3, 0).getType()==Material.AIR){
+				return true;
+			}
+			else return false;
+		}
 		else return false;
 	}
 	
