@@ -42,7 +42,7 @@ public class FloatingIslandsChunkPopulator extends BlockPopulator {
 		
 		if(startBlock.getType()==Material.GRASS){
 			/*no biome switch statement for debugging purposes; TODO: alter*/
-			placeTaigaObjects(startBlock);
+			placeSwampObjects(startBlock);
 		}
 		else if(startBlock.getType()==Material.SAND){
 			placeDesertObjects(startBlock);
@@ -74,17 +74,23 @@ public class FloatingIslandsChunkPopulator extends BlockPopulator {
 		for(int x=0; x<3; x++){
 			for(int z=0; z<3; z++){
 				int r=ran.nextInt(1000);
-				if(r<100){ //water with lily pad
+				/*try to spawn mushrooms with higher probability,
+				 *  since low light levels are rare*/
+				if(startBlock.getRelative(x, 1, z).getLightLevel()<13){
+					if(r<150){
+						startBlock.getRelative(x, 1, z)
+							.setType(Material.RED_MUSHROOM);
+					}
+					else if(r<450){
+						startBlock.getRelative(x, 1, z)
+							.setType(Material.BROWN_MUSHROOM);
+					}
+				}
+				else if(r<100){ //water with lily pad
 					startBlock.getRelative(x, 0, z).setType(Material.WATER);
 					startBlock.getRelative(x, 1, z).setType(Material.WATER_LILY);
 				}
-				else if(r<300){ //red mushroom
-					startBlock.getRelative(x, 1, z).setType(Material.RED_MUSHROOM);
-				}
-				else if(r<500){ //brown mushroom
-					startBlock.getRelative(x, 1, z).setType(Material.BROWN_MUSHROOM);
-				}
-				else if(r<600){ //tree
+				else if(r<350){ //tree
 					world.generateTree(
 							startBlock.getRelative(x, 1, z).getLocation(),
 							TreeType.SWAMP);
@@ -187,16 +193,19 @@ public class FloatingIslandsChunkPopulator extends BlockPopulator {
 		for(int x=0; x<3; x++){
 			for(int z=0; z<3; z++){
 				int r=ran.nextInt(1000);
-				/*since low light places for mushrooms are rare, try them every time*/
+				/*since low light places for mushrooms are rare,
+				 * try to spawn them with higher probability*/
 				if(startBlock.getRelative(x, 1, z).getLightLevel()<13){
-					if(r<300){
+					if(r<150){
 						startBlock.getRelative(x, 1, z)
 							.setType(Material.RED_MUSHROOM);
 					}
-					else startBlock.getRelative(x, 1, z)
-						.setType(Material.BROWN_MUSHROOM);
+					else if(r<450){
+						startBlock.getRelative(x, 1, z)
+							.setType(Material.BROWN_MUSHROOM);
+					}
 				}
-				if(r<100){ //spruce tree
+				else if(r<100){ //spruce tree
 					world.generateTree(
 							startBlock.getRelative(x, 1, z).getLocation(),
 							TreeType.REDWOOD);
