@@ -53,6 +53,11 @@ public class PlayerJoinListener implements Listener {
 			);
 			//newSpawnBlock is the block the player spawns inside!
 			Util.ensureTreeAtIsland(newSpawnBlock.getRelative(BlockFace.DOWN));
+			if(!Util.isValidSpawn(newSpawnBlock)){ //if tree generated is poor
+				newSpawnBlock.getRelative(0, 0, 0).setType(Material.AIR);
+				newSpawnBlock.getRelative(0, 1, 0).setType(Material.AIR);
+				newSpawnBlock.getRelative(0, 2, 0).setType(Material.AIR);
+			}
 			player.teleport(newSpawnBlock.getLocation());
 		}
 	}
