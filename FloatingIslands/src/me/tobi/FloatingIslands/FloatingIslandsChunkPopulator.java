@@ -64,6 +64,7 @@ public class FloatingIslandsChunkPopulator extends BlockPopulator {
 	 * @param startBlock The first block of the island to operate on
 	 */
 	private void placeSwampObjects(Block startBlock) {
+		boolean treeGenerated=false;
 		for(int x=0; x<3; x++){
 			for(int z=0; z<3; z++){
 				int r=ran.nextInt(1000);
@@ -84,11 +85,14 @@ public class FloatingIslandsChunkPopulator extends BlockPopulator {
 					startBlock.getRelative(x, 1, z).setType(Material.WATER_LILY);
 				}
 				else if(r<350){ //tree
-					world.generateTree(
+					treeGenerated=world.generateTree(
 							startBlock.getRelative(x, 1, z).getLocation(),
 							TreeType.SWAMP);
 				}
 			}
+		}
+		if(treeGenerated && Util.isValidSpawn(startBlock)){
+			Util.saveNewSpawn(startBlock);
 		}
 	}
 	
@@ -137,6 +141,7 @@ public class FloatingIslandsChunkPopulator extends BlockPopulator {
 	}
 
 	private void placeJungleObjects(Block startBlock) {
+		boolean treeGenerated=false;
 		for(int x=0; x<3; x++){
 			for(int z=0; z<3; z++){
 				int r=ran.nextInt(1000);
@@ -150,7 +155,7 @@ public class FloatingIslandsChunkPopulator extends BlockPopulator {
 							.getType()==Material.LOG){
 						continue;
 					}
-					world.generateTree(
+					treeGenerated=world.generateTree(
 							startBlock.getRelative(x, 1, z).getLocation(),
 							TreeType.SMALL_JUNGLE);
 					Block log=startBlock.getRelative(x-1, 3, z);
@@ -180,9 +185,13 @@ public class FloatingIslandsChunkPopulator extends BlockPopulator {
 				}
 			}
 		}
+		if(treeGenerated && Util.isValidSpawn(startBlock)){
+			Util.saveNewSpawn(startBlock);
+		}
 	}
 
 	private void placeTaigaObjects(Block startBlock) {
+		boolean treeGenerated=false;
 		for(int x=0; x<3; x++){
 			for(int z=0; z<3; z++){
 				int r=ran.nextInt(1000);
@@ -199,7 +208,7 @@ public class FloatingIslandsChunkPopulator extends BlockPopulator {
 					}
 				}
 				else if(r<100){ //spruce tree
-					world.generateTree(
+					treeGenerated=world.generateTree(
 							startBlock.getRelative(x, 1, z).getLocation(),
 							TreeType.REDWOOD);
 				}
@@ -208,24 +217,28 @@ public class FloatingIslandsChunkPopulator extends BlockPopulator {
 				}
 			}
 		}
+		if(treeGenerated && Util.isValidSpawn(startBlock)){
+			Util.saveNewSpawn(startBlock);
+		}
 	}
 
 	private void placeForestObjects(Block startBlock) {
+		boolean treeGenerated=false;
 		for(int x=0; x<3; x++){
 			for(int z=0; z<3; z++){
 				int r=ran.nextInt(1000);
 				if(r<50){
-					world.generateTree(
+					treeGenerated=world.generateTree(
 							startBlock.getRelative(x, 1, z).getLocation(),
 							TreeType.BIRCH);
 				}
 				else if(r<100){
-					world.generateTree(
+					treeGenerated=world.generateTree(
 							startBlock.getRelative(x, 1, z).getLocation(),
 							TreeType.TREE);
 				}
 				if(r<125){
-					world.generateTree(
+					treeGenerated=world.generateTree(
 							startBlock.getRelative(x, 1, z).getLocation(),
 							TreeType.BIG_TREE);
 				}
@@ -234,6 +247,9 @@ public class FloatingIslandsChunkPopulator extends BlockPopulator {
 					startBlock.getRelative(x, 1, z).setData((byte)1);
 				}
 			}
+		}
+		if(treeGenerated && Util.isValidSpawn(startBlock)){
+			Util.saveNewSpawn(startBlock);
 		}
 	}
 	

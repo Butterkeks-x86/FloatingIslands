@@ -1,5 +1,9 @@
 package me.tobi.FloatingIslands;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+
 import org.bukkit.Chunk;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -42,5 +46,22 @@ public class Util {
 			}
 		}
 		return retBlock;
+	}
+	
+	public static void saveNewSpawn(Block spawnBlock){
+		BufferedWriter out=null;
+		try{
+			out=new BufferedWriter(new FileWriter("spawn.dat"));
+			out.write(spawnBlock.getX()+" "+spawnBlock.getY()
+					+" "+spawnBlock.getZ()+"\r\n");
+		}catch(Exception e){
+			e.printStackTrace();
+		}finally{
+			try {
+				out.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
 	}
 }
