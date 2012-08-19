@@ -38,18 +38,22 @@ public class PlayerJoinListener implements Listener {
 			player.getInventory().addItem(new ItemStack(Material.LAVA_BUCKET, 1));
 			player.getInventory().addItem(new ItemStack(Material.MELON_SEEDS, 1));
 		}
+		/*ensure that the player spawns at a valid island*/
 		Location spawn=player.getWorld().getSpawnLocation();
 		if(!Util.isValidSpawn(spawn.getBlock().getRelative(BlockFace.DOWN))){
-			System.out.println("invalid spawn");
-			Location newSpawn=getNearestSpawnLocation(player.getWorld(), spawn);
-			System.out.println("new spawn is at x="+newSpawn.getBlockX()+" y="+
-					newSpawn.getY()+" z="+newSpawn.getZ());
+			System.out.println("invalid spawn at x="+spawn.getBlockX()+" y="+
+					spawn.getY()+" z="+spawn.getZ());
+			Block newSpawnBlock=getNearestSpawnBlock(player.getWorld(), spawn);
+			System.out.println("new spawn is at x="+newSpawnBlock.getX()+" y="+
+					newSpawnBlock.getY()+" z="+newSpawnBlock.getZ());
 			player.getWorld().setSpawnLocation(
-					newSpawn.getBlockX(),
-					newSpawn.getBlockY(),
-					newSpawn.getBlockZ()
+					newSpawnBlock.getX(),
+					newSpawnBlock.getY(),
+					newSpawnBlock.getZ()
 			);
-			player.teleport(newSpawn);
+			//newSpawnBlock is the block the player spawns inside!
+			Util.ensureTreeAtIsland(newSpawnBlock.getRelative(BlockFace.DOWN));
+			player.teleport(newSpawnBlock.getLocation());
 		}
 	}
 	
@@ -57,9 +61,9 @@ public class PlayerJoinListener implements Listener {
 	 * Tries to find a near valid spawn location
 	 * @param world The world the spawn is in
 	 * @param oldSpawn The old and invalid spawn
-	 * @return
+	 * @return The block the player spawns inside
 	 */
-	private Location getNearestSpawnLocation(World world, Location oldSpawn){
+	private Block getNearestSpawnBlock(World world, Location oldSpawn){
 		Chunk chunk=oldSpawn.getChunk();
 		do{
 			Block block=
@@ -67,7 +71,7 @@ public class PlayerJoinListener implements Listener {
 			/*if a grass block was found*/
 			if(block.getType()==Material.GRASS){
 				if(Util.isValidSpawn(block)){
-					return block.getRelative(BlockFace.UP).getLocation();
+					return block.getRelative(BlockFace.UP);
 				}
 				else{
 					chunk=world.getChunkAt(chunk.getX(), chunk.getZ()-1);

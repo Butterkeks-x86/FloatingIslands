@@ -23,13 +23,16 @@ public class FloatingIslands extends JavaPlugin{
 		islandGenProbability=this.getConfig().getDouble("island-gen-probability");
 		getLogger().info("maxGenHeight: "+maxGenHeight+"; minGenHeight: "+minGenHeight
 				+"; islandGenProbability: "+islandGenProbability);
-		
+		/*create folder for config file if it does not exist*/
+		if(!this.getDataFolder().exists()){
+			this.getDataFolder().mkdir();
+		}
 		/*on first join teleport the player to accurate spawn position*/
 		getServer().getPluginManager().registerEvents(
 				new PlayerJoinListener(maxGenHeight, minGenHeight), this);
 		/*on respawn, teleport the player to accurate spawn position*/
-//		getServer().getPluginManager().registerEvents(
-//				new PlayerRespawnListener(), this);
+		getServer().getPluginManager().registerEvents(
+				new PlayerRespawnListener(), this);
 		getLogger().info("FloatingIslands version "+VERSION+" enabled.");
 	}
 	

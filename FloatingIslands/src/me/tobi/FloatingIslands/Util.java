@@ -1,16 +1,18 @@
 package me.tobi.FloatingIslands;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
-
 import org.bukkit.Chunk;
 import org.bukkit.Material;
+import org.bukkit.TreeType;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 
 public class Util {
+	/**
+	 * 
+	 * @param spawnBlock The block, above the player spawns
+	 * @return
+	 */
 	public static boolean isValidSpawn(Block spawnBlock){
 		if(spawnBlock.getType()==Material.GRASS){
 			if(spawnBlock.getRelative(0, 1, 0).getType()==Material.AIR
@@ -48,20 +50,23 @@ public class Util {
 		return retBlock;
 	}
 	
-	public static void saveNewSpawn(Block spawnBlock){
-		BufferedWriter out=null;
-		try{
-			out=new BufferedWriter(new FileWriter("spawn.dat"));
-			out.write(spawnBlock.getX()+" "+spawnBlock.getY()
-					+" "+spawnBlock.getZ()+"\r\n");
-		}catch(Exception e){
-			e.printStackTrace();
-		}finally{
-			try {
-				out.close();
-			} catch (IOException e) {
-				e.printStackTrace();
+	public static void ensureTreeAtIsland(Block startBlock){
+		boolean treeFound=false;
+		for(int x=0; x<3; x++){
+			for(int z=0; z<3; z++){
+				if(startBlock.getRelative(x, 1, z).getType()==Material.LOG){
+					treeFound=true;
+					return;
+				}
 			}
+		}
+		if(!treeFound){
+			startBlock.getRelative(2, 0, 2).setType(Material.GRASS);
+			startBlock.getRelative(2, 1, 2).setType(Material.AIR);
+			startBlock.getWorld().generateTree(
+					startBlock.getRelative(2, 1, 2).getLocation(),
+					TreeType.TREE
+			);
 		}
 	}
 }
