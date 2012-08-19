@@ -20,7 +20,9 @@ public class FloatingIslands extends JavaPlugin{
 		/*first, parse island generation parameters from config*/
 		maxGenHeight=this.getConfig().getInt("max-gen-height");
 		minGenHeight=this.getConfig().getInt("min-gen-height");
-		islandGenProbability=this.getConfig().getInt("island-gen-probability");
+		islandGenProbability=this.getConfig().getDouble("island-gen-probability");
+		getLogger().info("maxGenHeight: "+maxGenHeight+"; minGenHeight: "+minGenHeight
+				+"; islandGenProbability: "+islandGenProbability);
 		
 		/*on first join teleport the player to accurate spawn position*/
 		getServer().getPluginManager().registerEvents(

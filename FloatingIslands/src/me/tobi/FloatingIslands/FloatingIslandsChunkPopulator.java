@@ -34,7 +34,7 @@ public class FloatingIslandsChunkPopulator extends BlockPopulator {
 	
 	private void placeObjects(){
 		Block startBlock=
-					Util.getFirstSolidBlockInChunk(chunk, minGenHeight, maxGenHeight);
+					Util.getFirstSolidBlockInChunk(chunk, maxGenHeight, minGenHeight);
 		
 		if(startBlock.getType()==Material.GRASS){
 			Biome biome=world.getBiome(startBlock.getX(), startBlock.getZ());
