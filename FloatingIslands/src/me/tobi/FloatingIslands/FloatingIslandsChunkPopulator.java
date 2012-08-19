@@ -10,7 +10,6 @@ import org.bukkit.block.Biome;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.generator.BlockPopulator;
-import org.bukkit.plugin.java.JavaPlugin;
 
 public class FloatingIslandsChunkPopulator extends BlockPopulator {
 	
@@ -20,9 +19,9 @@ public class FloatingIslandsChunkPopulator extends BlockPopulator {
 	private int maxGenHeight=127;
 	private int minGenHeight=0;
 	
-	public FloatingIslandsChunkPopulator(JavaPlugin parent){
-		maxGenHeight=parent.getConfig().getInt("max-gen-height");
-		minGenHeight=parent.getConfig().getInt("min-gen-height");
+	public FloatingIslandsChunkPopulator(int maxGenHeight, int minGenHeight){
+		this.maxGenHeight=maxGenHeight;
+		this.minGenHeight=minGenHeight;
 	}
 	
 	@Override
@@ -34,7 +33,8 @@ public class FloatingIslandsChunkPopulator extends BlockPopulator {
 	}
 	
 	private void placeObjects(){
-		Block startBlock=getFirstSolidBlockInChunk();
+		Block startBlock=
+					Util.getFirstSolidBlockInChunk(chunk, minGenHeight, maxGenHeight);
 		
 		if(startBlock.getType()==Material.GRASS){
 			Biome biome=world.getBiome(startBlock.getX(), startBlock.getZ());
@@ -258,20 +258,5 @@ public class FloatingIslandsChunkPopulator extends BlockPopulator {
 				}
 			}
 		}
-	}
-	
-	private Block getFirstSolidBlockInChunk(){
-		Block retBlock=null;
-		for(int x=0; x<16; x++){
-			for(int z=0; z<16; z++){
-				retBlock=chunk.getBlock(x, maxGenHeight, z);
-				while(retBlock.getType()==Material.AIR
-						&& retBlock.getY()>minGenHeight){
-					retBlock=retBlock.getRelative(BlockFace.DOWN);
-				}
-				if(retBlock.getType()!=Material.AIR) return retBlock;
-			}
-		}
-		return retBlock;
 	}
 }

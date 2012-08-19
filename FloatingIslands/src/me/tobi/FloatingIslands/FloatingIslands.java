@@ -11,12 +11,20 @@ import org.bukkit.plugin.java.JavaPlugin;
 public class FloatingIslands extends JavaPlugin{
 	
 	public static final String VERSION="0.1";
+	private int maxGenHeight=127;
+	private int minGenHeight=0;
+	private double islandGenProbability=0.3;
 	
 	@Override
 	public void onEnable(){
+		/*first, parse island generation parameters from config*/
+		maxGenHeight=this.getConfig().getInt("max-gen-height");
+		minGenHeight=this.getConfig().getInt("min-gen-height");
+		islandGenProbability=this.getConfig().getInt("island-gen-probability");
+		
 		/*on first join teleport the player to accurate spawn position*/
 		getServer().getPluginManager().registerEvents(
-				new PlayerJoinListener(), this);
+				new PlayerJoinListener(maxGenHeight, minGenHeight), this);
 		/*on respawn, teleport the player to accurate spawn position*/
 //		getServer().getPluginManager().registerEvents(
 //				new PlayerRespawnListener(), this);
@@ -30,6 +38,7 @@ public class FloatingIslands extends JavaPlugin{
 	
 	@Override
 	public ChunkGenerator getDefaultWorldGenerator(String worldName, String id){
-		return FloatingIslandsChunkGenerator.getInstance(this);
+		return new FloatingIslandsChunkGenerator(maxGenHeight,
+				minGenHeight, islandGenProbability);
 	}
 }
