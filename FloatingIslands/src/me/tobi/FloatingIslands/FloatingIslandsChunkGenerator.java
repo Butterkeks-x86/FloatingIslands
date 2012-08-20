@@ -8,6 +8,7 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Biome;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.generator.BlockPopulator;
 import org.bukkit.generator.ChunkGenerator;
 
@@ -68,7 +69,7 @@ public class FloatingIslandsChunkGenerator extends ChunkGenerator {
 		Block spawnBlock=Util.getHighestBlockOfType(world, x, z,
 				minGenHeight, maxGenHeight, Material.GRASS);
 		if(spawnBlock.getType()!=Material.GRASS) return false;
-		else return Util.isValidSpawn(spawnBlock);
+		else return Util.isValidSpawn(spawnBlock.getRelative(BlockFace.UP));
 	}
 	
 	private void generateIslandAccordingToBiome(byte[][] chunk, int height,

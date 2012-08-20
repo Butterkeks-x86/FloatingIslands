@@ -10,15 +10,28 @@ import org.bukkit.block.BlockFace;
 public class Util {
 	/**
 	 * 
-	 * @param spawnBlock The block, above the player spawns
+	 * @param spawnBlock The block, the player spawns "inside"
 	 * @return
 	 */
 	public static boolean isValidSpawn(Block spawnBlock){
-		if(spawnBlock.getType()==Material.GRASS){
-			if(spawnBlock.getRelative(0, 1, 0).getType()==Material.AIR
-					&& spawnBlock.getRelative(0, 2, 0).getType()==Material.AIR
+		//ensure that the block below the player is grass
+		if(spawnBlock.getRelative(BlockFace.DOWN).getType()==Material.GRASS){
+			//ensure that the player can spawn inside the spawn block
+			if(spawnBlock.getType()==Material.AIR
+					|| spawnBlock.getType()==Material.GRASS
+					|| spawnBlock.getType()==Material.SUGAR_CANE_BLOCK
+					|| spawnBlock.getType()==Material.RED_MUSHROOM
+					|| spawnBlock.getType()==Material.BROWN_MUSHROOM
+					|| spawnBlock.getType()==Material.RED_ROSE
+					|| spawnBlock.getType()==Material.YELLOW_FLOWER
+					|| spawnBlock.getType()==Material.SNOW
+			){
+				//ensure that the two blocks above them are air
+				if(spawnBlock.getRelative(0, 2, 0).getType()==Material.AIR
 					&& spawnBlock.getRelative(0, 3, 0).getType()==Material.AIR){
-				return true;
+					return true;
+				}
+				else return false;
 			}
 			else return false;
 		}
@@ -50,6 +63,10 @@ public class Util {
 		return retBlock;
 	}
 	
+	/**
+	 * Ensures a tree on an island
+	 * @param startBlock The first block of this island
+	 */
 	public static void ensureTreeAtIsland(Block startBlock){
 		boolean treeFound=false;
 		for(int x=0; x<3; x++){
@@ -61,8 +78,8 @@ public class Util {
 			}
 		}
 		if(!treeFound){
-			startBlock.getRelative(2, 0, 2).setType(Material.GRASS);
-			startBlock.getRelative(2, 1, 2).setType(Material.AIR);
+			startBlock.getRelative(2, 0, 2).setType(Material.DIRT); //base of tree
+			startBlock.getRelative(2, 1, 2).setType(Material.AIR); //free this block
 			startBlock.getWorld().generateTree(
 					startBlock.getRelative(2, 1, 2).getLocation(),
 					TreeType.TREE
