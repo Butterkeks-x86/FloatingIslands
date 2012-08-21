@@ -29,7 +29,8 @@ public class FloatingIslands extends JavaPlugin{
 		}
 		/*on first join teleport the player to accurate spawn position*/
 		getServer().getPluginManager().registerEvents(
-				new PlayerJoinListener(maxGenHeight, minGenHeight), this);
+				new PlayerJoinListener(maxGenHeight, minGenHeight,
+						this.getDataFolder()), this);
 		/*on respawn, teleport the player to accurate spawn position*/
 		getServer().getPluginManager().registerEvents(
 				new PlayerRespawnListener(), this);

@@ -1,5 +1,7 @@
 package me.tobi.FloatingIslands.Listeners;
 
+import java.io.File;
+
 import me.tobi.FloatingIslands.Util;
 
 import org.bukkit.Chunk;
@@ -18,10 +20,13 @@ public class PlayerJoinListener implements Listener {
 	
 	private int maxGenHeight=127;
 	private int minGenHeight=0;
+	private File pluginDataFolder;
 	
-	public PlayerJoinListener(int maxGenHeight, int minGenHeight){
+	public PlayerJoinListener(int maxGenHeight, int minGenHeight,
+			File pluginDataFolder){
 		this.maxGenHeight=maxGenHeight;
 		this.minGenHeight=minGenHeight;
+		this.pluginDataFolder=pluginDataFolder;
 	}
 	
 	/**
@@ -34,7 +39,7 @@ public class PlayerJoinListener implements Listener {
 		Player player=pjevt.getPlayer();
 		World world=player.getWorld();
 		if(!player.hasPlayedBefore()){
-			/*TODO: start items -> chest*/
+			/*TODO: start items -> chest?*/
 			player.getInventory().addItem(new ItemStack(Material.ICE, 1));
 			player.getInventory().addItem(new ItemStack(Material.LAVA_BUCKET, 1));
 			player.getInventory().addItem(new ItemStack(Material.MELON_SEEDS, 1));
@@ -49,9 +54,13 @@ public class PlayerJoinListener implements Listener {
 					spawnBlock.getY(),
 					spawnBlock.getZ()
 			);
+			/*save the new spawn to a file*/
+			Util.saveSpawnToFile(pluginDataFolder.getPath()+"spawn", spawnBlock);
+			/*place bedrock at spawn*/
 			spawnBlock.getRelative(0, -3, 0).setType(Material.BEDROCK);
-			//spawnBlock is the block the player spawns inside!
+			/*ensure a tree at spawn island*/
 			Util.ensureTreeAtIsland(spawnBlock.getRelative(-1, -1, -1));
+			/*finally, teleport the player to the new spawn location*/
 			player.teleport(spawnBlock.getLocation());
 		}
 	}
