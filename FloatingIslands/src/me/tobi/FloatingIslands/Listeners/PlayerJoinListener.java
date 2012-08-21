@@ -4,6 +4,7 @@ import me.tobi.FloatingIslands.Util;
 
 import org.bukkit.Chunk;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
@@ -31,28 +32,26 @@ public class PlayerJoinListener implements Listener {
 	@EventHandler
 	public void onPlayerJoin(PlayerJoinEvent pjevt){
 		Player player=pjevt.getPlayer();
+		World world=player.getWorld();
 		if(!player.hasPlayedBefore()){
 			/*TODO: start items -> chest*/
 			player.getInventory().addItem(new ItemStack(Material.ICE, 1));
 			player.getInventory().addItem(new ItemStack(Material.LAVA_BUCKET, 1));
 			player.getInventory().addItem(new ItemStack(Material.MELON_SEEDS, 1));
 			
-			/*ensure that the player spawns at a valid spawn location*/
-			Block spawnBlock=player.getWorld().getSpawnLocation().getBlock();
-			if(!Util.isValidSpawn(spawnBlock)){
-				System.out.println("invalid spawn at x="+spawnBlock.getX()+" y="+
-						spawnBlock.getY()+" z="+spawnBlock.getZ());
-				spawnBlock=getNearestSpawnBlock(spawnBlock);
-				System.out.println("new spawn is at x="+spawnBlock.getX()+" y="+
-						spawnBlock.getY()+" z="+spawnBlock.getZ());
-				player.getWorld().setSpawnLocation(
-						spawnBlock.getX(),
-						spawnBlock.getY(),
-						spawnBlock.getZ()
-				);
-			}
+			/*always look for a new spawn*/
+			Block spawnBlock=getNearestSpawnBlock(
+					world.getChunkAt(world.getSpawnLocation()));
+			System.out.println("new spawn is at x="+spawnBlock.getX()+" y="+
+					spawnBlock.getY()+" z="+spawnBlock.getZ());
+			player.getWorld().setSpawnLocation(
+					spawnBlock.getX(),
+					spawnBlock.getY(),
+					spawnBlock.getZ()
+			);
+			spawnBlock.getRelative(0, -3, 0).setType(Material.BEDROCK);
 			//spawnBlock is the block the player spawns inside!
-			Util.ensureTreeAtIsland(spawnBlock.getRelative(BlockFace.DOWN));
+			Util.ensureTreeAtIsland(spawnBlock.getRelative(-1, -1, -1));
 			player.teleport(spawnBlock.getLocation());
 		}
 	}
@@ -63,11 +62,13 @@ public class PlayerJoinListener implements Listener {
 	 * @param oldSpawn The old and invalid spawn
 	 * @return The block the player spawns inside
 	 */
-	private Block getNearestSpawnBlock(Block oldSpawnBlock){
-		Chunk chunk=oldSpawnBlock.getChunk();
+	private Block getNearestSpawnBlock(Chunk oldChunk){
+		Chunk chunk=oldChunk.getWorld().getChunkAt(oldChunk.getX()+1,
+				oldChunk.getZ()+1); //move to another chunk
 		do{
 			Block block=
 					Util.getFirstSolidBlockInChunk(chunk, maxGenHeight, minGenHeight);
+			block=block.getRelative(1, 0, 1); //we want the new spawn at the center
 			/*if a grass block was found*/
 			if(block.getType()==Material.GRASS){
 				if(Util.isValidSpawn(block.getRelative(BlockFace.UP))){

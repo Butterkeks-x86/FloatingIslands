@@ -66,10 +66,11 @@ public class FloatingIslandsChunkGenerator extends ChunkGenerator {
 	 */
 	@Override
 	public boolean canSpawn(World world, int x, int z){
-		Block spawnBlock=Util.getHighestBlockOfType(world, x, z,
-				minGenHeight, maxGenHeight, Material.GRASS);
-		if(spawnBlock.getType()!=Material.GRASS) return false;
-		else return Util.isValidSpawn(spawnBlock.getRelative(BlockFace.UP));
+//		Block spawnBlock=Util.getHighestBlockOfType(world, x, z,
+//				minGenHeight, maxGenHeight, Material.GRASS);
+//		if(spawnBlock.getType()!=Material.GRASS) return false;
+//		else return Util.isValidSpawn(spawnBlock.getRelative(BlockFace.UP));
+		return false;
 	}
 	
 	private void generateIslandAccordingToBiome(byte[][] chunk, int height,
