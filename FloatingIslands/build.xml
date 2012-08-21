@@ -27,6 +27,7 @@
 			</fileset>
 		</delete>
 		<delete file="BukkitServer/plugins/FloatingIslands.jar"/>
+		<delete dir="BukkitServer/plugins/FloatingIslands"/>
 	</target>
 	
 </project>
