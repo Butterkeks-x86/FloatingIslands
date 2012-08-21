@@ -92,6 +92,7 @@ public class Util {
 	}
 	
 	public static void saveSpawnToFile(String path, Block spawnBlock){
+		System.out.println("saving spawn to file \""+path+"\"");
 		BufferedWriter out=null;
 		try {
 			out=new BufferedWriter(new FileWriter(path));
@@ -108,5 +109,6 @@ public class Util {
 				}
 			}
 		}
+		System.out.println("spawn saved");
 	}
 }

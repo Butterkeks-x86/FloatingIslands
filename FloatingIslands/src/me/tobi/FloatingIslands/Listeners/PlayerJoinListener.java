@@ -55,7 +55,7 @@ public class PlayerJoinListener implements Listener {
 					spawnBlock.getZ()
 			);
 			/*save the new spawn to a file*/
-			Util.saveSpawnToFile(pluginDataFolder.getPath()+"spawn", spawnBlock);
+			Util.saveSpawnToFile(pluginDataFolder.getAbsolutePath()+"\\spawn", spawnBlock);
 			/*place bedrock at spawn*/
 			spawnBlock.getRelative(0, -3, 0).setType(Material.BEDROCK);
 			/*ensure a tree at spawn island*/
