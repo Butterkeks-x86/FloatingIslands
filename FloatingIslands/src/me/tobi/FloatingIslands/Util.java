@@ -1,5 +1,9 @@
 package me.tobi.FloatingIslands;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+
 import org.bukkit.Chunk;
 import org.bukkit.Material;
 import org.bukkit.TreeType;
@@ -84,6 +88,25 @@ public class Util {
 					startBlock.getRelative(2, 1, 2).getLocation(),
 					TreeType.TREE
 			);
+		}
+	}
+	
+	public static void saveSpawnToFile(String path, Block spawnBlock){
+		BufferedWriter out=null;
+		try {
+			out=new BufferedWriter(new FileWriter(path));
+			out.write(spawnBlock.getX()+" "+spawnBlock.getY()+" "
+					+spawnBlock.getZ()+"\n");
+		} catch (IOException e) {
+			e.printStackTrace();
+		}finally{
+			if(out!=null){
+				try{
+					out.close();
+				}catch(IOException e){
+					e.printStackTrace();
+				}
+			}
 		}
 	}
 }
