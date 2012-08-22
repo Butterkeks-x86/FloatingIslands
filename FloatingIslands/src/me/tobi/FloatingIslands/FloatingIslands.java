@@ -1,6 +1,8 @@
 package me.tobi.FloatingIslands;
 
 
+import java.io.File;
+
 import me.tobi.FloatingIslands.Listeners.PlayerJoinListener;
 import me.tobi.FloatingIslands.Listeners.PlayerRespawnListener;
 
@@ -26,6 +28,9 @@ public class FloatingIslands extends JavaPlugin{
 		/*create folder for config file if it does not exist*/
 		if(!this.getDataFolder().exists()){
 			this.getDataFolder().mkdir();
+		}
+		if(!new File(this.getConfig().getCurrentPath()).exists()){
+			this.saveDefaultConfig();
 		}
 		/*on first join teleport the player to accurate spawn position*/
 		getServer().getPluginManager().registerEvents(
