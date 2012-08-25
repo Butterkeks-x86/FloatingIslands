@@ -35,9 +35,9 @@ public class FloatingIslandsChunkPopulator extends BlockPopulator {
 	private void placeObjects(){
 		Block startBlock=
 					Util.getFirstSolidBlockInChunk(chunk, maxGenHeight, minGenHeight);
+		Biome biome=world.getBiome(startBlock.getX(), startBlock.getZ());
 		
 		if(startBlock.getType()==Material.GRASS){
-			Biome biome=world.getBiome(startBlock.getX(), startBlock.getZ());
 			switch(biome){
 			case FOREST: placeForestObjects(startBlock); break;
 			case FOREST_HILLS: placeForestObjects(startBlock); break;
@@ -49,12 +49,12 @@ public class FloatingIslandsChunkPopulator extends BlockPopulator {
 			case SWAMPLAND: placeSwampObjects(startBlock); break;
 			case ICE_PLAINS: placeIceBiomeObjects(startBlock); break;
 			case ICE_MOUNTAINS: placeIceBiomeObjects(startBlock); break;
-			case EXTREME_HILLS:break; //TODO: unimplemented
-			case SMALL_MOUNTAINS: break; //TOD: unimplemented
+			case EXTREME_HILLS: placeHillsObjects(startBlock); break;
+			case SMALL_MOUNTAINS: placeHillsObjects(startBlock); break;
 			default: break; //ignore other stuff like mushroom islands...
 			}
 		}
-		else if(startBlock.getType()==Material.SAND){
+		else if(startBlock.getType()==Material.SAND && biome!=Biome.BEACH){
 			placeDesertObjects(startBlock);
 		}
 	}
@@ -79,7 +79,9 @@ public class FloatingIslandsChunkPopulator extends BlockPopulator {
 							.setType(Material.BROWN_MUSHROOM);
 					}
 				}
-				else if(r<100){ //water with lily pad
+				/*water with lilipad: avoid island edges*/
+				else if(r<100){
+					if((x==0 || x==2) && (z==0 || z==2)) return;
 					startBlock.getRelative(x, 0, z).setType(Material.WATER);
 					startBlock.getRelative(x, 1, z).setType(Material.WATER_LILY);
 				}
@@ -255,6 +257,25 @@ public class FloatingIslandsChunkPopulator extends BlockPopulator {
 				}
 				else if(r<400){
 					startBlock.getRelative(x, 1, z).setType(Material.LONG_GRASS);
+				}
+			}
+		}
+	}
+	
+	/**
+	 * Modifies sialnd according to extreme hills and small mountains biome
+	 * @param startBlock The first block of thi island
+	 */
+	private void placeHillsObjects(Block startBlock){
+		for(int x=0; x<3; x++){
+			for(int z=0; z<3; z++){
+				int r=ran.nextInt(1000);
+				if(r<100){
+					startBlock.getRelative(x, 1, z).setType(Material.LONG_GRASS);
+					startBlock.getRelative(x, 1, z).setData((byte)1);
+				}
+				else if(r<150){
+					startBlock.getRelative(x, 1, z).setType(Material.PUMPKIN);
 				}
 			}
 		}
