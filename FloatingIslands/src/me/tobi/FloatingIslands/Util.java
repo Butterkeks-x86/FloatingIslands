@@ -1,6 +1,9 @@
 package me.tobi.FloatingIslands;
 
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 
@@ -92,7 +95,6 @@ public class Util {
 	}
 	
 	public static void saveSpawnToFile(String path, Block spawnBlock){
-		System.out.println("saving spawn to file \""+path+"\"");
 		BufferedWriter out=null;
 		try {
 			out=new BufferedWriter(new FileWriter(path));
@@ -109,6 +111,36 @@ public class Util {
 				}
 			}
 		}
-		System.out.println("spawn saved");
+	}
+	
+	public static Block readSpawnFromFile(String path, World world){
+		BufferedReader in=null;
+		Block ret=null;
+		try{
+			in=new BufferedReader(new FileReader(path));
+			String tokens[]=in.readLine().split(" ");
+			if(tokens.length==3){
+				ret=world.getBlockAt(
+						Integer.parseInt(tokens[0]),
+						Integer.parseInt(tokens[1]),
+						Integer.parseInt(tokens[2])
+						);
+			}
+		}catch(FileNotFoundException e){
+			return null;
+		}catch(IOException e){
+			e.printStackTrace();
+		}catch(NumberFormatException e){
+			e.printStackTrace();
+		}finally{
+			try{
+				if(in!=null){
+					in.close();
+				}
+			}catch(IOException e){
+				e.printStackTrace();
+			}
+		}
+		return ret;
 	}
 }
