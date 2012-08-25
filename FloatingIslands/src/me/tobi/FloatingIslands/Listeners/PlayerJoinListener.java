@@ -38,37 +38,50 @@ public class PlayerJoinListener implements Listener {
 	public void onPlayerJoin(PlayerJoinEvent pjevt){
 		Player player=pjevt.getPlayer();
 		World world=player.getWorld();
+		
 		if(!player.hasPlayedBefore()){
-			/*TODO: start items -> chest?*/
+			/*first, try to get old spawn and teleport player to it if found*/
+			Block oldSpawn;
+			oldSpawn=Util.readSpawnFromFile(
+					pluginDataFolder.getAbsolutePath()+"\\spawn", world);
+			if(oldSpawn!=null){
+				System.out.println("found old spawn x="+oldSpawn.getX()+" y="+
+						oldSpawn.getY()+" z="+oldSpawn.getZ());
+				player.teleport(oldSpawn.getLocation());
+			}
+			/*if not found, look for a new spawn and save it as default*/
+			else{
+				//search for a new spawn
+				Block spawnBlock=getNearestSpawnBlock(
+						world.getChunkAt(world.getSpawnLocation()));
+				System.out.println("new spawn is at x="+spawnBlock.getX()+" y="+
+						spawnBlock.getY()+" z="+spawnBlock.getZ());
+				player.getWorld().setSpawnLocation(
+						spawnBlock.getX(),
+						spawnBlock.getY(),
+						spawnBlock.getZ()
+				);
+				//save the new spawn to a file
+				Util.saveSpawnToFile(pluginDataFolder.getAbsolutePath()+"\\spawn",
+						spawnBlock);
+				//place bedrock at spawn
+				spawnBlock.getRelative(0, -3, 0).setType(Material.BEDROCK);
+				//ensure a tree at spawn island
+				Util.ensureTreeAtIsland(spawnBlock.getRelative(-1, -1, -1));
+				//finally, teleport the player to the new spawn location
+				player.teleport(spawnBlock.getLocation());
+			}
+
+			/*always to do: give the player his/her starter kit*/
 			player.getInventory().addItem(new ItemStack(Material.ICE, 1));
 			player.getInventory().addItem(new ItemStack(Material.LAVA_BUCKET, 1));
 			player.getInventory().addItem(new ItemStack(Material.MELON_SEEDS, 1));
-			
-			/*always look for a new spawn*/
-			Block spawnBlock=getNearestSpawnBlock(
-					world.getChunkAt(world.getSpawnLocation()));
-			System.out.println("new spawn is at x="+spawnBlock.getX()+" y="+
-					spawnBlock.getY()+" z="+spawnBlock.getZ());
-			player.getWorld().setSpawnLocation(
-					spawnBlock.getX(),
-					spawnBlock.getY(),
-					spawnBlock.getZ()
-			);
-			/*save the new spawn to a file*/
-			Util.saveSpawnToFile(pluginDataFolder.getAbsolutePath()+"\\spawn", spawnBlock);
-			/*place bedrock at spawn*/
-			spawnBlock.getRelative(0, -3, 0).setType(Material.BEDROCK);
-			/*ensure a tree at spawn island*/
-			Util.ensureTreeAtIsland(spawnBlock.getRelative(-1, -1, -1));
-			/*finally, teleport the player to the new spawn location*/
-			player.teleport(spawnBlock.getLocation());
 		}
 	}
 	
 	/**
 	 * Tries to find a near valid spawn location
-	 * @param world The world the spawn is in
-	 * @param oldSpawn The old and invalid spawn
+	 * @param oldChunk The chunk the old spawn is in
 	 * @return The block the player spawns inside
 	 */
 	private Block getNearestSpawnBlock(Chunk oldChunk){
