@@ -39,8 +39,10 @@ public class FloatingIslandsChunkGenerator extends ChunkGenerator {
 		/*generate with given probability an island*/
 		if(random.nextInt(100)<Math.floor(islandGenProbability*100)){
 			int height=random.nextInt(maxGenHeight-minGenHeight)+minGenHeight;
-			generateIslandAccordingToBiome(result, height, random,
-					biomeGrid.getBiome(3, 3));
+			int x=random.nextInt(14);
+			int z=random.nextInt(14);
+			generateIslandAccordingToBiome(result, x, height, z, random,
+					biomeGrid.getBiome(x, z));
 		}
 		
 		//TODO: remove, since for debugging purposes
@@ -71,49 +73,52 @@ public class FloatingIslandsChunkGenerator extends ChunkGenerator {
 		return false;
 	}
 	
-	private void generateIslandAccordingToBiome(byte[][] chunk, int height,
+	/**
+	 * Generates an Island according to a given biome.
+	 * @param chunk The byte array the result should be stored
+	 * @param x The x start coordinate within the chunk 
+	 * @param y The height of the top blocks of the island
+	 * @param z The z start coordinate within the chunk
+	 * @param ran The random to use
+	 * @param bio The given biome
+	 */
+	private void generateIslandAccordingToBiome(byte[][] chunk, int x, int y, int z,
 			Random ran, Biome bio){
 		if(bio==Biome.DESERT || bio==Biome.DESERT_HILLS){
-			generateSandIsland(chunk, height, ran);
+			generateSandIsland(chunk, x, y, z, ran);
 		}
 		else if(bio==Biome.FOREST_HILLS || bio==Biome.TAIGA_HILLS
 				|| bio==Biome.JUNGLE_HILLS || bio==Biome.ICE_MOUNTAINS
 				|| bio==Biome.SMALL_MOUNTAINS || bio==Biome.EXTREME_HILLS){
-			generateDirtIslandWithOres(chunk, height, ran);
+			generateDirtIslandWithOres(chunk, x, y, z, ran);
 		}
 		else{
-			generateDirtIsland(chunk, height, ran);
+			generateDirtIsland(chunk, x, y, z, ran);
 		}
 	}
 	
-	private void generateDirtIslandWithOres(byte[][] chunk, int height,
+	private void generateDirtIslandWithOres(byte[][] chunk, int x, int y, int z,
 			Random ran) {
 		StructureGenerator sg=new StructureGenerator(chunk, ran);
-		int x=ran.nextInt(14);
-		int z=ran.nextInt(14);
 		if(z<7){
-			sg.generateLayersRandomReplace(x, height-1, z, 3, 2,
+			sg.generateLayersRandomReplace(x, y-1, z, 3, 2,
 					(byte)Material.DIRT.getId(), (byte)Material.IRON_ORE.getId());
 		}
 		else{
-			sg.generateLayersRandomReplace(x, height-1, z, 3, 2,
+			sg.generateLayersRandomReplace(x, y-1, z, 3, 2,
 					(byte)Material.DIRT.getId(), (byte)Material.COAL_ORE.getId());
 		}
-		sg.generateLayer(x, height, z, 3, (byte)Material.GRASS.getId());
+		sg.generateLayer(x, y, z, 3, (byte)Material.GRASS.getId());
 	}
 
-	private void generateSandIsland(byte[][] chunk, int height, Random ran){
+	private void generateSandIsland(byte[][] chunk, int x, int y, int z, Random ran){
 		StructureGenerator sg=new StructureGenerator(chunk, ran);
-		int x=ran.nextInt(14);
-		int z=ran.nextInt(14);
-		sg.generateLayers(x, height, z, 3, 3, (byte)Material.SAND.getId());
+		sg.generateLayers(x, y, z, 3, 3, (byte)Material.SAND.getId());
 	}
 	
-	private void generateDirtIsland(byte[][] chunk, int height, Random ran){
+	private void generateDirtIsland(byte[][] chunk, int x, int y, int z, Random ran){
 		StructureGenerator sg=new StructureGenerator(chunk, ran);
-		int x=ran.nextInt(14);
-		int z=ran.nextInt(14);
-		sg.generateLayers(x, height-1, z, 3, 2, (byte)Material.DIRT.getId());
-		sg.generateLayer(x, height, z, 3, (byte)Material.GRASS.getId());
+		sg.generateLayers(x, y-1, z, 3, 2, (byte)Material.DIRT.getId());
+		sg.generateLayer(x, y, z, 3, (byte)Material.GRASS.getId());
 	}
 }
