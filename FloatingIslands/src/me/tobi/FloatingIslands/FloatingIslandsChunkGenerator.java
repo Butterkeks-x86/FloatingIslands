@@ -84,7 +84,7 @@ public class FloatingIslandsChunkGenerator extends ChunkGenerator {
 	 */
 	private void generateIslandAccordingToBiome(byte[][] chunk, int x, int y, int z,
 			Random ran, Biome bio){
-		if(bio==Biome.DESERT || bio==Biome.DESERT_HILLS){
+		if(bio==Biome.DESERT || bio==Biome.DESERT_HILLS || bio==Biome.BEACH){
 			generateSandIsland(chunk, x, y, z, ran);
 		}
 		else if(bio==Biome.FOREST_HILLS || bio==Biome.TAIGA_HILLS
