@@ -92,6 +92,10 @@ public class FloatingIslandsChunkGenerator extends ChunkGenerator {
 				|| bio==Biome.SMALL_MOUNTAINS || bio==Biome.EXTREME_HILLS){
 			generateDirtIslandWithOres(chunk, x, y, z, ran);
 		}
+		else if(bio==Biome.OCEAN || bio==Biome.FROZEN_OCEAN || bio==Biome.RIVER
+				|| bio==Biome.FROZEN_RIVER){
+			return; //do nothing
+		}
 		else{
 			generateDirtIsland(chunk, x, y, z, ran);
 		}
