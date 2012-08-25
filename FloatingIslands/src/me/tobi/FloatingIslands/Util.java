@@ -16,9 +16,9 @@ import org.bukkit.block.BlockFace;
 
 public class Util {
 	/**
-	 * 
+	 * Tests, if a given block is valid for spawning a player
 	 * @param spawnBlock The block, the player spawns "inside"
-	 * @return
+	 * @return True, if a valid spawnBlock, false otherwise
 	 */
 	public static boolean isValidSpawn(Block spawnBlock){
 		//ensure that the block below the player is grass
@@ -45,6 +45,16 @@ public class Util {
 		else return false;
 	}
 	
+	/**
+	 * Provides the highest block at a given position of given type
+	 * @param world The world the location is in
+	 * @param x The x-coordinate to search
+	 * @param z The z-coordinate to search
+	 * @param minHeight the minimum height to search at
+	 * @param maxHeight The maximum heigth to search at
+	 * @param type The type of block searched for
+	 * @return The highest block of this type or the block at minimum height
+	 */
 	public static Block getHighestBlockOfType(World world, int x, int z,
 			int minHeight, int maxHeight, Material type){
 		Block block=world.getBlockAt(x, maxHeight, z);
@@ -54,6 +64,13 @@ public class Util {
 		return block;
 	}
 	
+	/**
+	 * Provides the first non-air block in the given chunk
+	 * @param chunk
+	 * @param maxHeight The maximum height to search at
+	 * @param minHeight The minimum heigth to sreach at
+	 * @return The first solid block or the last tested air block, if none found
+	 */
 	public static Block getFirstSolidBlockInChunk(Chunk chunk,
 			int maxHeight, int minHeight){
 		Block retBlock=null;
@@ -68,6 +85,28 @@ public class Util {
 			}
 		}
 		return retBlock;
+	}
+	
+	/**
+	 * Gets a direct adjacent block (not diagonal) block of the given type
+	 * @param block The block whose adjacent neighbour is searched
+	 * @param type The type of the block searched for
+	 * @return The next adjacent block of the given type or null if none found
+	 */
+	public static Block getAjacentBlockOfType(Block block, Material type){
+		if(block.getRelative(BlockFace.NORTH).getType()!=type){
+			if(block.getRelative(BlockFace.EAST).getType()!=type){
+				if(block.getRelative(BlockFace.SOUTH).getType()!=type){
+					if(block.getRelative(BlockFace.WEST).getType()!=type){
+						return null;
+					}
+					else return block.getRelative(BlockFace.WEST);
+				}
+				else return block.getRelative(BlockFace.SOUTH);
+			}
+			else return block.getRelative(BlockFace.EAST);
+		}
+		else return block.getRelative(BlockFace.NORTH);
 	}
 	
 	/**
