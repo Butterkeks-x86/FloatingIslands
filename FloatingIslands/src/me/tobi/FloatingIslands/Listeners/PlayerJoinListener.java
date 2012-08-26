@@ -68,6 +68,9 @@ public class PlayerJoinListener implements Listener {
 				spawnBlock.getRelative(0, -3, 0).setType(Material.BEDROCK);
 				//ensure a tree at spawn island
 				Util.ensureTreeAtIsland(spawnBlock.getRelative(-1, -1, -1));
+				//ensure air at player spawn (because of generated tree!)
+				spawnBlock.getRelative(0, 1, 0).setType(Material.AIR);
+				spawnBlock.getRelative(0, 2, 0).setType(Material.AIR);
 				//finally, teleport the player to the new spawn location
 				player.teleport(spawnBlock.getLocation());
 			}
