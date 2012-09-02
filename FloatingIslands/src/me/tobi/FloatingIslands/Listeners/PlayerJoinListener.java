@@ -5,8 +5,11 @@ import java.io.File;
 import me.tobi.FloatingIslands.Util;
 
 import org.bukkit.Chunk;
+import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.TreeType;
 import org.bukkit.World;
+import org.bukkit.block.Biome;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
@@ -20,6 +23,7 @@ public class PlayerJoinListener implements Listener {
 	
 	private int maxGenHeight=127;
 	private int minGenHeight=0;
+	private static int spawnX=6, spawnY=64, spawnZ=7;
 	private File pluginDataFolder;
 	
 	public PlayerJoinListener(int maxGenHeight, int minGenHeight,
@@ -51,28 +55,25 @@ public class PlayerJoinListener implements Listener {
 			}
 			/*if not found, look for a new spawn and save it as default*/
 			else{
-				//search for a new spawn
-				Block spawnBlock=getNearestSpawnBlock(
-						world.getChunkAt(world.getSpawnLocation()));
-				System.out.println("new spawn is at x="+spawnBlock.getX()+" y="+
-						spawnBlock.getY()+" z="+spawnBlock.getZ());
+				//look for an appropriate empty chunk
+				Chunk spawnChunk=getNearEmptyChunkInPopulatedBiome(
+						world.getSpawnLocation().getChunk());
+				//spawn block within this chunk is fixed
+				Block spawnBlock=spawnChunk.getBlock(spawnX, spawnY, spawnZ);
+				//create the spawning island
+				createSpawnIsland(spawnBlock.getRelative(-1, -1, -1));
+				//set the new spawn ...
 				player.getWorld().setSpawnLocation(
 						spawnBlock.getX(),
 						spawnBlock.getY(),
-						spawnBlock.getZ()
-				);
-				//save the new spawn to a file
+						spawnBlock.getZ());
+				//...and save it to file
 				Util.saveSpawnToFile(pluginDataFolder.getAbsolutePath()+"\\spawn",
 						spawnBlock);
-				//place bedrock at spawn
-				spawnBlock.getRelative(0, -3, 0).setType(Material.BEDROCK);
-				//ensure a tree at spawn island
-				Util.ensureTreeAtIsland(spawnBlock.getRelative(-1, -1, -1));
-				//ensure air at player spawn (because of generated tree!)
-				spawnBlock.getRelative(0, 1, 0).setType(Material.AIR);
-				spawnBlock.getRelative(0, 2, 0).setType(Material.AIR);
-				//finally, teleport the player to the new spawn location
-				player.teleport(spawnBlock.getLocation());
+				//get the spawn location and teleport the player to it
+				Location spawn=new Location(world, spawnBlock.getX()+0.5,
+						spawnBlock.getY()+0.5, spawnBlock.getZ()+0.5);
+				player.teleport(spawn);
 			}
 
 			/*always to do: give the player his/her starter kit*/
@@ -83,32 +84,66 @@ public class PlayerJoinListener implements Listener {
 	}
 	
 	/**
-	 * Tries to find a near valid spawn location
-	 * @param oldChunk The chunk the old spawn is in
-	 * @return The block the player spawns inside
+	 * Searches for an empty chunk in a populated biome, i.e. not in
+	 * a ocean or river biome
+	 * @param chunk The chunk to start the search with (will be considered itself)
+	 * @return A empty chunk within a populated biome
 	 */
-	private Block getNearestSpawnBlock(Chunk oldChunk){
-		Chunk chunk=oldChunk.getWorld().getChunkAt(oldChunk.getX()+1,
-				oldChunk.getZ()+1); //move to another chunk
+	private Chunk getNearEmptyChunkInPopulatedBiome(Chunk chunk){
+		Biome bio;
 		do{
-			Block block=
-					Util.getFirstSolidBlockInChunk(chunk, maxGenHeight, minGenHeight);
-			block=block.getRelative(1, 0, 1); //we want the new spawn at the center
-			/*if a grass block was found*/
-			if(block.getType()==Material.GRASS){
-				if(Util.isValidSpawn(block.getRelative(BlockFace.UP))){
-					return block.getRelative(BlockFace.UP);
-				}
-				else{
-					chunk=chunk.getWorld().getChunkAt(chunk.getX(), chunk.getZ()-1);
-					continue;
+			while(Util.getFirstSolidBlockInChunk(chunk,
+					maxGenHeight, minGenHeight).getType()!=Material.AIR){
+				chunk=chunk.getWorld().getChunkAt(chunk.getX()+1,
+						chunk.getZ()-1);
+			}
+			bio=chunk.getWorld().getBiome(chunk.getX()*16, chunk.getZ()*16);
+		}while(bio==Biome.OCEAN || bio==Biome.FROZEN_OCEAN
+				|| bio==Biome.RIVER || bio==Biome.FROZEN_RIVER);
+		return chunk;
+	}
+	
+	/**
+	 * Creates the spawning island
+	 * @param startBlock The first block of the spawning island
+	 */
+	private void createSpawnIsland(Block startBlock){
+		//two layers of dirt
+		for(int y=-2; y<0; y++){
+			for(int x=0; x<3; x++){
+				for(int z=0; z<3; z++){
+					startBlock.getRelative(x, y, z).setType(Material.DIRT);
 				}
 			}
-			/*if no grass block was found*/
-			else{
-				chunk=chunk.getWorld().getChunkAt(chunk.getX()+1, chunk.getZ());
-				continue;
+		}
+		//the spawn bedrock block
+		startBlock.getRelative(1, -2, 1).setType(Material.BEDROCK);
+		//top layer of grass
+		for(int x=0; x<3; x++){
+			for(int z=0; z<3; z++){
+				startBlock.getRelative(x, 0, z).setType(Material.GRASS);
 			}
-		}while(true);
+		}
+		//lower two layers of leaves
+		for(int y=4; y<6; y++){
+			for(int x=0; x<5; x++){
+				for(int z=0; z<5; z++){
+					startBlock.getRelative(x, y, z).setType(Material.LEAVES);
+				}
+			}
+		}
+		//upper two layers of leaves
+		for(int y=6; y<8; y++){
+			for(int x=1; x<4; x++){
+				for(int z=1; z<4; z++){
+					if((x==1 || x==3) && (z==1 || z==3))continue;
+					else startBlock.getRelative(x, y, z).setType(Material.LEAVES);
+				}
+			}
+		}
+		//the stem
+		for(int y=1; y<7; y++){
+			startBlock.getRelative(2, y, 2).setType(Material.LOG);
+		}
 	}
 }
