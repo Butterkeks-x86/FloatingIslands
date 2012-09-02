@@ -63,10 +63,6 @@ public class FloatingIslandsChunkGenerator extends ChunkGenerator {
 					biomeGrid.getBiome(x, z));
 		}
 		
-		//TODO: remove, since for debugging purposes
-		new StructureGenerator(result, random)
-			.generateLayer(0, 0, 0, 16, (byte)Material.BEDROCK.getId());
-		
 		return result;
 	}
 	
