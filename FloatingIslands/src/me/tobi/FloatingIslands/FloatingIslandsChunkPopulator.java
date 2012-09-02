@@ -38,6 +38,9 @@ public class FloatingIslandsChunkPopulator extends BlockPopulator {
 		Biome biome=world.getBiome(startBlock.getX(), startBlock.getZ());
 		
 		if(startBlock.getType()==Material.GRASS){
+			//ignore spawn island
+			if(startBlock.getRelative(1, -2, 1).getType()==Material.BEDROCK) return;
+			//place objects according to biome
 			switch(biome){
 			case FOREST: placeForestObjects(startBlock); break;
 			case FOREST_HILLS: placeForestObjects(startBlock); break;
