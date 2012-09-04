@@ -63,7 +63,7 @@ public class FloatingIslandsChunkGenerator extends ChunkGenerator {
 	}
 	
 	/**
-	 * Return always false: spawn location will be evaluated in playerJoinListener
+	 * Return always false: spawn location will be prepared in playerJoinListener
 	 */
 	@Override
 	public boolean canSpawn(World world, int x, int z){
@@ -82,7 +82,7 @@ public class FloatingIslandsChunkGenerator extends ChunkGenerator {
 	private void generateLevel1Island(byte[][] chunk, int x, int y, int z,
 			Random ran, Biome bio){
 		if(bio==Biome.DESERT || bio==Biome.DESERT_HILLS || bio==Biome.BEACH){
-			generateSandIsland(chunk, x, y, z, ran);
+			generateSandIsland(chunk, x, y, z);
 		}
 		else if(bio==Biome.FOREST_HILLS || bio==Biome.TAIGA_HILLS
 				|| bio==Biome.JUNGLE_HILLS || bio==Biome.ICE_MOUNTAINS
@@ -94,59 +94,107 @@ public class FloatingIslandsChunkGenerator extends ChunkGenerator {
 			return; //do nothing
 		}
 		else{
-			generateDirtIsland(chunk, x, y, z, ran);
+			generateDirtIsland(chunk, x, y, z);
 		}
 	}
 	
-	private void generateDirtIslandWithOres(byte[][] chunk, int x, int y, int z,
-			Random ran) {
-		StructureGenerator sg=new StructureGenerator(chunk, ran);
-		if(z<7){
-			sg.generateLayersRandomReplace(x, y-1, z, 3, 2,
-					(byte)Material.DIRT.getId(), (byte)Material.IRON_ORE.getId());
+	/**
+	 * Generates a 3x3x3 sand island at given start coordinates within given chunk.
+	 * The start coordinates represend the top layer SW edge block.
+	 * @param chunk The chunk to generate in
+	 * @param xs The x start cordinate (0...13)
+	 * @param ys The y start coordinate (2...127), i.e. top layer
+	 * @param zs The z start coordinate (0...13)
+	 */
+	private void generateSandIsland(byte[][] chunk, int xs, int ys, int zs){
+		for(int y=ys-2; y<=ys; y++){
+			for(int x=xs; x<xs+3; x++){
+				for(int z=zs; z<zs+3; z++){
+					setBlock(chunk, x, y, z, Material.SAND);
+				}
+			}
 		}
-		else{
-			sg.generateLayersRandomReplace(x, y-1, z, 3, 2,
-					(byte)Material.DIRT.getId(), (byte)Material.COAL_ORE.getId());
-		}
-		sg.generateLayer(x, y, z, 3, (byte)Material.GRASS.getId());
-	}
-
-	private void generateSandIsland(byte[][] chunk, int x, int y, int z, Random ran){
-		StructureGenerator sg=new StructureGenerator(chunk, ran);
-		sg.generateLayers(x, y, z, 3, 3, (byte)Material.SAND.getId());
 	}
 	
-	private void generateDirtIsland(byte[][] chunk, int x, int y, int z, Random ran){
-		StructureGenerator sg=new StructureGenerator(chunk, ran);
-		sg.generateLayers(x, y-1, z, 3, 2, (byte)Material.DIRT.getId());
-		sg.generateLayer(x, y, z, 3, (byte)Material.GRASS.getId());
+	/**
+	 * Generates a dirt island with a top layer of grass with in given chunk.
+	 * Start coordinates represent top layer SW edge block.
+	 * @param chunk The chunk to generate in
+	 * @param xs The x start coordinate (0...13)
+	 * @param ys The y start coordinate (2...127)
+	 * @param zs The z start coordinate (0...13)
+	 */
+	private void generateDirtIsland(byte[][] chunk, int xs, int ys, int zs){
+		for(int y=ys-2; y<ys; y++){
+			for(int x=xs; x<xs+3; x++){
+				for(int z=zs; z<zs+3; z++){
+					setBlock(chunk, x, y, z, Material.DIRT);
+				}
+			}
+		}
+		for(int x=xs; x<xs+3; x++){
+			for(int z=zs; z<zs+3; z++){
+				setBlock(chunk, x, ys, z, Material.GRASS);
+			}
+		}
+	}
+	
+	/**
+	 * Generates a dirt island with a top layer of grass and two layers
+	 * of randomly placed iron or coal ores.
+	 * The start coordinates represent the top layer SW edge block.
+	 * @param chunk The chunk to generate in
+	 * @param xs The x start coordinate (0...13)
+	 * @param ys The y start coordinate (2...127)
+	 * @param zs The z start coordinate (0...13)
+	 * @param ran The random needed
+	 */
+	private void generateDirtIslandWithOres(byte [][]chunk, int xs, int ys, int zs,
+			Random ran){
+		for(int y=ys-2; y<ys; y++){
+			for(int x=xs; x<xs+3; x++){
+				for(int z=zs; z<zs+3; z++){
+					int r=ran.nextInt(1000);
+					if(r<100){
+						setBlock(chunk, x, y, z, Material.COAL_ORE);
+					}
+					else if(r<150){
+						setBlock(chunk, x, y, z, Material.IRON_ORE);
+					}
+					else setBlock(chunk, x, y, z, Material.DIRT);
+				}
+			}
+		}
+		for(int x=xs; x<xs+3; x++){
+			for(int z=zs; z<zs+3; z++){
+				setBlock(chunk, x, ys, z, Material.GRASS);
+			}
+		}
 	}
 	
 	private void generateLevel0Island(byte[][] chunk, int xs, int ys, int zs,
 			Random ran){
-		StructureGenerator sg=new StructureGenerator(chunk, ran);
 		//first two layers of ores
 		for(int y=ys-2; y<ys; y++){
 			for(int x=xs; x<xs+3; x++){
 				for(int z=zs; z<zs+3; z++){
 					int r=ran.nextInt(1000);
 					if(r<150){
-						sg.setBlock(x, y, z, (byte)Material.COAL_ORE.getId());
+						setBlock(chunk, x, y, z, Material.COAL_ORE);
 					}
 					else if(r<250){
-						sg.setBlock(x, y, z, (byte)Material.IRON_ORE.getId());
+						setBlock(chunk, x, y, z, Material.IRON_ORE);
 					}
 					else if(r<300){
-						sg.setBlock(x, y, z, (byte)Material.REDSTONE_ORE.getId());
+						setBlock(chunk, x, y, z, Material.REDSTONE_ORE);
 					}
 					else if(r<340){
-						sg.setBlock(x, y, z, (byte)Material.GOLD_ORE.getId());
+						setBlock(chunk, x, y, z, Material.GOLD_ORE);
 					}
 					else if(r<370){
-						sg.setBlock(x, y, z, (byte)Material.DIAMOND_ORE.getId());
+						setBlock(chunk, x, y, z, Material.DIAMOND_ORE);
 					}
-					else sg.setBlock(x, y, z, (byte)Material.STONE.getId());
+					else setBlock(chunk, x, y, z, Material.STONE);
 				}
 			}
 		}
@@ -155,10 +203,27 @@ public class FloatingIslandsChunkGenerator extends ChunkGenerator {
 			for(int z=zs; z<zs+3; z++){
 				int r=ran.nextInt(1000);
 				if(r<100 && !((x==xs || x==xs+2) && (z==zs || z==zs+2))){
-					sg.setBlock(x, ys, z, (byte)Material.LAVA.getId());
+					setBlock(chunk, x, ys, z, Material.LAVA);
 				}
-				else sg.setBlock(x, ys, z, (byte)Material.STONE.getId());
+				else setBlock(chunk, x, ys, z, Material.STONE);
 			}
 		}
+	}
+	
+	/**
+	 * Utility method to set a block within the chunk array.
+	 * @param chunk The chunk array to set the block in
+	 * @param x The x coordinate of the block, values from 0...15
+	 * @param y The y coordinate of the block, values 0...127
+	 * @param z The z coordinate of the block, values 0...15
+	 * @param type The Material of the block
+	 */
+	private void setBlock(byte [][]chunk, int x, int y, int z, Material type) {
+	    if (chunk[y >> 4] == null) //is this chunkpart already initialised?
+	    {
+	        chunk[y >> 4] = new byte[4096]; //initialise the chunk part
+	    }
+	    //set the block
+	    chunk[y >> 4][((y & 0xF) << 8) | (z << 4) | x] = (byte)type.getId();
 	}
 }
