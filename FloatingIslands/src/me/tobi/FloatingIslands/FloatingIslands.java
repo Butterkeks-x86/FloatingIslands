@@ -13,26 +13,14 @@ import org.bukkit.plugin.java.JavaPlugin;
 public class FloatingIslands extends JavaPlugin{
 	
 	public static final String VERSION="0.1";
-	private int level0MaxGenHeight=32;
-	private int level0MinGenHeight=6;
-	private double level0GenProbability=0.1;
-	private int level1MaxGenHeight=80;
-	private int level1MinGenHeight=48;
-	private double level1GenProbability=0.3;
+	private FloatingIslandsConfig config;
 	
 	@Override
 	public void onEnable(){
-		/*first, parse island generation parameters from config*/
-		level0MaxGenHeight=this.getConfig().getInt("level0-max-gen-height");
-		level0MinGenHeight=this.getConfig().getInt("level0-min-gen-height");
-		level0GenProbability=this.getConfig().getDouble("level0-gen-probability");
-		getLogger().info("level0: maxGenHeight: "+level0MaxGenHeight+"; minGenHeight: "
-				+level0MinGenHeight+"; islandGenProbability: "+level0GenProbability);
-		level1MaxGenHeight=this.getConfig().getInt("level1-max-gen-height");
-		level1MinGenHeight=this.getConfig().getInt("level1-min-gen-height");
-		level1GenProbability=this.getConfig().getDouble("level1-gen-probability");
-		getLogger().info("level1: maxGenHeight: "+level1MaxGenHeight+"; minGenHeight: "
-				+level1MinGenHeight+"; islandGenProbability: "+level1GenProbability);
+		/*first, load and parse configuratiion parameters*/
+		config=new FloatingIslandsConfig(this.getConfig());
+		config.parse();
+		this.getLogger().info(config.getConfigurationAsString());
 		/*create folder and config file if they do not exist*/
 		if(!this.getDataFolder().exists()){
 			this.getDataFolder().mkdir();
@@ -42,8 +30,7 @@ public class FloatingIslands extends JavaPlugin{
 		}
 		/*on first join teleport the player to accurate spawn position*/
 		getServer().getPluginManager().registerEvents(
-				new PlayerJoinListener(level1MaxGenHeight, level1MinGenHeight,
-						this.getDataFolder()), this);
+				new PlayerJoinListener(config, this.getDataFolder()), this);
 		/*on respawn, teleport the player to accurate spawn position*/
 		getServer().getPluginManager().registerEvents(
 				new PlayerRespawnListener(), this);
@@ -57,8 +44,6 @@ public class FloatingIslands extends JavaPlugin{
 	
 	@Override
 	public ChunkGenerator getDefaultWorldGenerator(String worldName, String id){
-		return new FloatingIslandsChunkGenerator(
-				level0MaxGenHeight, level0MinGenHeight, level0GenProbability,
-				level1MaxGenHeight, level1MinGenHeight, level1GenProbability);
+		return new FloatingIslandsChunkGenerator(this.config);
 	}
 }

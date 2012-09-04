@@ -12,27 +12,14 @@ import org.bukkit.generator.ChunkGenerator;
 
 public class FloatingIslandsChunkGenerator extends ChunkGenerator {
 	
-	private int level0MaxGenHeight=32;
-	private int level0MinGenHeight=6;
-	private double level0GenProbability=0.1;
-	private int level1MaxGenHeight=127;
-	private int level1MinGenHeight=0;
-	private double level1GenProbability=0.3;
+	private FloatingIslandsConfig config;
 	
 	/**
 	 * Constructor
 	 * @param logger The logger to use within this class
 	 */
-	public FloatingIslandsChunkGenerator(int level0MaxGenHeight,
-			int level0MinGenHeight, double level0GenProbability,
-			int level1MaxGenHeight, int level1MinGenHeight,
-			double level1GenProbability){
-		this.level0MaxGenHeight=level0MaxGenHeight;
-		this.level0MinGenHeight=level0MinGenHeight;
-		this.level0GenProbability=level0GenProbability;
-		this.level1MaxGenHeight=level1MaxGenHeight;
-		this.level1MinGenHeight=level1MinGenHeight;
-		this.level1GenProbability=level1GenProbability;
+	public FloatingIslandsChunkGenerator(FloatingIslandsConfig config){
+		this.config=config;
 	}
 	
 	@Override
@@ -45,18 +32,19 @@ public class FloatingIslandsChunkGenerator extends ChunkGenerator {
 		result=new byte[16][];
 		
 		/*generate with given probability a level0 island*/
-		if(random.nextInt(100)<Math.floor(level0GenProbability*100)){
-			int y=random.nextInt(level0MaxGenHeight-level0MinGenHeight)
-					+level0MinGenHeight;
+		if(random.nextInt(100)<Math.floor(config.level0GenProbability*100)){
+			int y=random.nextInt(config.level0MaxGenHeight-config.level0MinGenHeight)
+					+config.level0MinGenHeight;
 			int x=random.nextInt(14);
 			int z=random.nextInt(14);
 			generateLevel0Island(result, x, y, z, random);
 		}
 		
 		/*generate with given probability an level1 island*/
-		if(random.nextInt(100)<Math.floor(level1GenProbability*100)){
-			int height=random.nextInt(level1MaxGenHeight-level1MinGenHeight)
-					+level1MinGenHeight;
+		if(random.nextInt(100)<Math.floor(config.level1GenProbability*100)){
+			int height=random.nextInt(
+					config.level1MaxGenHeight-config.level1MinGenHeight)
+					+config.level1MinGenHeight;
 			int x=random.nextInt(14);
 			int z=random.nextInt(14);
 			generateLevel1Island(result, x, height, z, random,
@@ -69,8 +57,8 @@ public class FloatingIslandsChunkGenerator extends ChunkGenerator {
 	@Override
 	public List<BlockPopulator> getDefaultPopulators(World world){
 		ArrayList<BlockPopulator> list=new ArrayList<BlockPopulator>();
-		list.add(new FloatingIslandsChunkPopulator(level1MaxGenHeight,
-				level1MinGenHeight));
+		list.add(new FloatingIslandsChunkPopulator(config.level1MaxGenHeight,
+				config.level1MinGenHeight));
 		return list;
 	}
 	

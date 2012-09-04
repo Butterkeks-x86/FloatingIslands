@@ -2,6 +2,7 @@ package me.tobi.FloatingIslands.Listeners;
 
 import java.io.File;
 
+import me.tobi.FloatingIslands.FloatingIslandsConfig;
 import me.tobi.FloatingIslands.Util;
 
 import org.bukkit.Chunk;
@@ -24,10 +25,9 @@ public class PlayerJoinListener implements Listener {
 	private static int spawnX=6, spawnY=64, spawnZ=7;
 	private File pluginDataFolder;
 	
-	public PlayerJoinListener(int maxGenHeight, int minGenHeight,
-			File pluginDataFolder){
-		this.maxGenHeight=maxGenHeight;
-		this.minGenHeight=minGenHeight;
+	public PlayerJoinListener(FloatingIslandsConfig config, File pluginDataFolder){
+		this.maxGenHeight=config.level1MaxGenHeight;
+		this.minGenHeight=config.level1MinGenHeight;
 		this.pluginDataFolder=pluginDataFolder;
 	}
 	
