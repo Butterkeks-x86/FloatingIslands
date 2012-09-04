@@ -1,0 +1,38 @@
+FloatingIslands ver. 1.0 installation instrutctions
+
+1.  Download the latest version of CraftBukkit (if nor already done):
+   	- go for http://www.bukkit.org -> follow the the link to the recommended build
+   	  on the right
+   	- download craftbukkit.jar and put it into a empty folder (this will be your
+   	  "installation folder")
+   	
+2.	Ajust the config: if your bukkit server is already installed and you've made
+	changes to the default config, you will have to adjust the configuration files
+	manually:
+	- open "bukkit.yml" in your favorite text editor and append the following content:
+	  
+	  worlds:<enter>
+	  <exactly two spaces>floatingIslands:<enter>
+	  <exactly four spaces>defaultGenerator:<enter>
+	  
+	  Be sure to type it character by character as above or it will not work!
+	  You could also copy these three lines form the "bukkit.yml"-file provided
+	  with this plugin.
+	- open "server.properties" with yout default text editor and change the line
+	
+	  level-name: <world-name>
+	  
+	  to the following:
+	  
+	  level-name: floatingsIslands
+	  
+	  Save the new settings.
+	
+	If you just installed CraftBukkit or deleted the configuration files, you may
+	simply copy the provided "bukki.yml" and "server.properties" into the installation
+	folder of your BukkitServer. These are the default configuration files with the
+	needed changes already made.
+	The adjustment of the configuration files will force the server to generate a new
+	world with the name "floatingIslands" with the new chunk generator provided by this
+	plugin.
+   	
