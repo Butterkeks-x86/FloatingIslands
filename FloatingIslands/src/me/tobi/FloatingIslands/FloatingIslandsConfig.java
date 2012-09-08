@@ -20,6 +20,7 @@ public class FloatingIslandsConfig {
 	public int level1MinGenHeight=0;
 	public int level1MaxGenHeight=127;
 	public double level1GenProbability=0.1;
+	public boolean generateStructures=true;
 	
 	/**
 	 * Constructor.
@@ -39,6 +40,7 @@ public class FloatingIslandsConfig {
 		level1MaxGenHeight=fileConfig.getInt("level1-max-gen-height");
 		level1MinGenHeight=fileConfig.getInt("level1-min-gen-height");
 		level1GenProbability=fileConfig.getDouble("level1-gen-probability");
+		generateStructures=fileConfig.getBoolean("generate-structures");
 	}
 	
 	/**
@@ -51,6 +53,7 @@ public class FloatingIslandsConfig {
 			  +" islandGenProbability: "+level0GenProbability
 			  +" level1: maxGenHeight: "+level1MaxGenHeight
 			  +" minGenHeight: "+level1MinGenHeight
-			  +" islandGenProbability: "+level1GenProbability;
+			  +" islandGenProbability: "+level1GenProbability
+			  +" generateStructures: "+generateStructures;
 	}
 }
