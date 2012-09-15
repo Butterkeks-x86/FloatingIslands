@@ -4,4 +4,4 @@ level0-gen-probability: 0.05
 level1-max-gen-height: 72
 level1-min-gen-height: 56
 level1-gen-probability: 0.3
-spawn-height: 64
+generate-structures: true
