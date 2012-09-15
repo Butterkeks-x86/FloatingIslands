@@ -2,6 +2,7 @@ package me.tobi.FloatingIslands;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -9,41 +10,12 @@ import java.io.IOException;
 
 import org.bukkit.Chunk;
 import org.bukkit.Material;
-import org.bukkit.TreeType;
 import org.bukkit.World;
+import org.bukkit.block.Biome;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 
 public class Util {
-	/**
-	 * Tests, if a given block is valid for spawning a player
-	 * @param spawnBlock The block, the player spawns "inside"
-	 * @return True, if a valid spawnBlock, false otherwise
-	 */
-	public static boolean isValidSpawn(Block spawnBlock){
-		//ensure that the block below the player is grass
-		if(spawnBlock.getRelative(BlockFace.DOWN).getType()==Material.GRASS){
-			//ensure that the player can spawn inside the spawn block
-			if(spawnBlock.getType()==Material.AIR
-					|| spawnBlock.getType()==Material.GRASS
-					|| spawnBlock.getType()==Material.SUGAR_CANE_BLOCK
-					|| spawnBlock.getType()==Material.RED_MUSHROOM
-					|| spawnBlock.getType()==Material.BROWN_MUSHROOM
-					|| spawnBlock.getType()==Material.RED_ROSE
-					|| spawnBlock.getType()==Material.YELLOW_FLOWER
-					|| spawnBlock.getType()==Material.SNOW
-			){
-				//ensure that the two blocks above them are air
-				if(spawnBlock.getRelative(0, 2, 0).getType()==Material.AIR
-					&& spawnBlock.getRelative(0, 3, 0).getType()==Material.AIR){
-					return true;
-				}
-				else return false;
-			}
-			else return false;
-		}
-		else return false;
-	}
 	
 	/**
 	 * Provides the highest block at a given position of given type
@@ -110,29 +82,126 @@ public class Util {
 	}
 	
 	/**
-	 * Ensures a tree on an island
-	 * @param startBlock The first block of this island
+	 * Ensures a valid spawn for the floating islands world. if the spawn could be read
+	 * from file, it will be set. If not, it will be searched for a new valid spawn,
+	 * the spawning island will be created, the spawn will be set and written to file.
+	 * Note: this only applies to FloatingIslands worlds! This method will run endlessly
+	 * if providing a normal world or invalid FloatingIslands config!
+	 * @param floatingIslandsWorld The world to ensure a valid spawn
+	 * @param dataFolder The folder to search for a old spawn file
+	 * @param config The config of the FloatingIslands plugin
 	 */
-	public static void ensureTreeAtIsland(Block startBlock){
-		boolean treeFound=false;
-		for(int x=0; x<3; x++){
-			for(int z=0; z<3; z++){
-				if(startBlock.getRelative(x, 1, z).getType()==Material.LOG){
-					treeFound=true;
-					return;
-				}
-			}
+	private static int spawnX=6, spawnY=64, spawnZ=7; //TODO: read from config?
+	public static void ensureValidSpawn(World floatingIslandsWorld, File dataFolder,
+			FloatingIslandsConfig config){
+		/*first, try to get old spawn*/
+		Block oldSpawn;
+		oldSpawn=Util.readSpawnFromFile(
+				dataFolder.getAbsolutePath()+"/spawn", floatingIslandsWorld);
+		if(oldSpawn!=null){
+			return;
 		}
-		if(!treeFound){
-			startBlock.getRelative(2, 0, 2).setType(Material.DIRT); //base of tree
-			startBlock.getRelative(2, 1, 2).setType(Material.AIR); //free this block
-			startBlock.getWorld().generateTree(
-					startBlock.getRelative(2, 1, 2).getLocation(),
-					TreeType.TREE
-			);
+		/*if not found, look for a new spawn and save it as default*/
+		else{
+			//look for an appropriate empty chunk
+			Chunk spawnChunk=getNearEmptyChunkInPopulatedBiome(
+					floatingIslandsWorld.getSpawnLocation().getChunk(),
+					config.level1MaxGenHeight,
+					config.level1MinGenHeight);
+			//spawn block within this chunk is fixed
+			Block spawnBlock=spawnChunk.getBlock(spawnX, spawnY, spawnZ);
+			//create the spawning island
+			createSpawnIsland(spawnBlock.getRelative(-1, -1, -1));
+			//set the new spawn ...
+			floatingIslandsWorld.setSpawnLocation(
+					spawnBlock.getX(),
+					spawnBlock.getY(),
+					spawnBlock.getZ());
+			//...and save it to file
+			Util.saveSpawnToFile(dataFolder.getAbsolutePath()+"/spawn", spawnBlock);
 		}
 	}
 	
+	/**
+	 * Searches for an empty chunk in a populated biome, i.e. not in
+	 * a ocean or river biome
+	 * @param chunk The chunk to start the search with (will be considered itself)
+	 * @param level1MaxGenHeight ChunkGenerator maximum generation height
+	 * @param level1MinGenHeight ChunkGenerator minimum generation height
+	 * @return A empty chunk within a populated biome
+	 */	
+	public static Chunk getNearEmptyChunkInPopulatedBiome(Chunk chunk,
+			int maxGenHeight, int minGenHeight){
+		while(true){
+			Biome bio=chunk.getWorld().getBiome(chunk.getX()*16, chunk.getZ()*16);
+			while(bio==Biome.OCEAN || bio==Biome.FROZEN_OCEAN
+					|| bio==Biome.RIVER || bio==Biome.FROZEN_RIVER){
+				chunk=chunk.getWorld().getChunkAt(chunk.getX()+1, chunk.getZ()-1);
+				bio=chunk.getWorld().getBiome(chunk.getX()*16, chunk.getZ()*16);
+			}
+			Block first=Util.getFirstSolidBlockInChunk(chunk, maxGenHeight, minGenHeight);
+			while(first.getType()!=Material.AIR){
+				chunk=chunk.getWorld().getChunkAt(chunk.getX()+1, chunk.getZ()-1);
+				first=Util.getFirstSolidBlockInChunk(chunk, maxGenHeight, minGenHeight);
+			}
+			bio=chunk.getWorld().getBiome(chunk.getX()*16, chunk.getZ()*16);
+			if(bio!=Biome.OCEAN && bio!=Biome.FROZEN_OCEAN
+				&& bio!=Biome.RIVER && bio!=Biome.FROZEN_RIVER){
+				return chunk;
+			}
+		}
+	}
+	
+	/**
+	 * Creates the spawning island
+	 * @param startBlock The first block of the spawning island
+	 */
+	public static void createSpawnIsland(Block startBlock){
+		//two layers of dirt
+		for(int y=-2; y<0; y++){
+			for(int x=0; x<3; x++){
+				for(int z=0; z<3; z++){
+					startBlock.getRelative(x, y, z).setType(Material.DIRT);
+				}
+			}
+		}
+		//the spawn bedrock block
+		startBlock.getRelative(1, -2, 1).setType(Material.BEDROCK);
+		//top layer of grass
+		for(int x=0; x<3; x++){
+			for(int z=0; z<3; z++){
+				startBlock.getRelative(x, 0, z).setType(Material.GRASS);
+			}
+		}
+		//lower two layers of leaves
+		for(int y=4; y<6; y++){
+			for(int x=0; x<5; x++){
+				for(int z=0; z<5; z++){
+					startBlock.getRelative(x, y, z).setType(Material.LEAVES);
+				}
+			}
+		}
+		//upper two layers of leaves
+		for(int y=6; y<8; y++){
+			for(int x=1; x<4; x++){
+				for(int z=1; z<4; z++){
+					if((x==1 || x==3) && (z==1 || z==3))continue;
+					else startBlock.getRelative(x, y, z).setType(Material.LEAVES);
+				}
+			}
+		}
+		//the stem
+		for(int y=1; y<7; y++){
+			startBlock.getRelative(2, y, 2).setType(Material.LOG);
+		}
+	}
+	
+	/**
+	 * Saves a given spawn location to a file as specified by path. Old spawn (if exists)
+	 * might be overwritten.
+	 * @param path The path to the spawn file
+	 * @param spawnBlock The spawn block to spawn inside
+	 */
 	public static void saveSpawnToFile(String path, Block spawnBlock){
 		BufferedWriter out=null;
 		try {
@@ -152,6 +221,12 @@ public class Util {
 		}
 	}
 	
+	/**
+	 * Tries to read a spawn block from a given spawn file.
+	 * @param path The path to the spawn file
+	 * @param world The world the spawn resides in
+	 * @return The spawn block if found; null otherwise
+	 */
 	public static Block readSpawnFromFile(String path, World world){
 		BufferedReader in=null;
 		Block ret=null;
