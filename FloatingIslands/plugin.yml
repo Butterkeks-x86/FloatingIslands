@@ -1,4 +1,9 @@
 name: FloatingIslands
 main: me.tobi.FloatingIslands.FloatingIslands
 version: 0.1
-load: STARTUP
+commands:
+  floatingIslands:
+    description: Join or leave the FloatingIslands realm
+    usage: /floatingIslands join to enter the floating islands realm and /floatingIslands leave to leave it
+    permissions: FloatingIslands.join
+    permission-message: You don't have the permission to join the FloaringIslands realm
