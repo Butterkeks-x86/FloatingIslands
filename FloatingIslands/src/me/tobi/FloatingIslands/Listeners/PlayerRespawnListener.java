@@ -1,11 +1,18 @@
 package me.tobi.FloatingIslands.Listeners;
 
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerRespawnEvent;
 
 public class PlayerRespawnListener implements Listener {
+	
+	private World floatingIslandsWorld;
+	
+	public PlayerRespawnListener(World floatingIslandsWorld){
+		this.floatingIslandsWorld=floatingIslandsWorld;
+	}
 	
 	/**
 	 * Sets the exact respawn location if the palyer died, instead of
@@ -15,6 +22,8 @@ public class PlayerRespawnListener implements Listener {
 	@EventHandler
 	public void onPlayerRespawn(PlayerRespawnEvent prevt){
 		Player player=prevt.getPlayer();
-		prevt.setRespawnLocation(player.getWorld().getSpawnLocation());
+		if(player.getWorld()==floatingIslandsWorld){
+			prevt.setRespawnLocation(floatingIslandsWorld.getSpawnLocation());
+		}
 	}
 }
