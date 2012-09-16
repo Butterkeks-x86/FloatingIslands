@@ -3,10 +3,14 @@ package me.tobi.FloatingIslands;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 
 import org.bukkit.Chunk;
 import org.bukkit.Material;
@@ -256,5 +260,75 @@ public class Util {
 			}
 		}
 		return ret;
+	}
+	
+	/**
+	 * Serializes a PlayerHandler object to the according file.
+	 * @param ph The PlayerHandler to serialize
+	 * @param dataFolder the FloatingIslandsPlugin data folder
+	 */
+	public static void serializePlayerHandler(FloatingIslandsPlayerHandler ph,
+			File dataFolder){
+		if(ph==null) return;
+		ObjectOutputStream oout=null;
+		try{
+			//proove that file exists; if not create a new one
+			File playerFile=new File(dataFolder.getAbsolutePath()+"/"+ph.getPlayerName());
+			if(!playerFile.exists()){
+				playerFile.createNewFile();
+			}
+			//write the given PlayerHandler to file
+			oout=new ObjectOutputStream(new FileOutputStream(playerFile));
+			oout.writeObject(ph);
+		}catch(IOException e){
+			e.printStackTrace();
+		}finally{
+			try{
+				if(oout!=null){
+					oout.close();
+				}
+			}catch(IOException e){
+					e.printStackTrace();
+			}
+		}
+	}
+	
+	/**
+	 * Tries to deserialize a PlayerHandler object from a file.
+	 * @param dataFolder The data folder of FloatingIsalndsPlugin
+	 * @param playerName the name of the player whose Playerhandler is searched
+	 * @return the requested PlayerHandler or null, if file or object in file not found
+	 */
+	public static FloatingIslandsPlayerHandler deserializePlayerHandler(File dataFolder,
+			String playerName){
+		//first, proove that file exists
+		File playerFile=new File(dataFolder.getAbsolutePath()+"/"+playerName);
+		if(!playerFile.exists()){
+			return null;
+		}
+		//try to read in the requested object
+		ObjectInputStream oin=null;
+		Object ret=null;
+		try{
+			oin=new ObjectInputStream(new FileInputStream(playerFile));
+			ret=oin.readObject();
+		}catch(ClassNotFoundException e){
+			ret=null;
+		}catch(IOException e){
+			e.printStackTrace();
+		}finally{
+			try{
+				if(oin!=null){
+					oin.close();
+				}
+			}catch(IOException e){
+				e.printStackTrace();
+			}
+		}
+		//perform simple validation
+		if(((FloatingIslandsPlayerHandler)ret).getPlayerName().equalsIgnoreCase(playerName)){
+			return (FloatingIslandsPlayerHandler)ret;
+		}
+		else return null;
 	}
 }
