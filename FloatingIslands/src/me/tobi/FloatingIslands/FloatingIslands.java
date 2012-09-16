@@ -8,6 +8,7 @@ import java.util.List;
 import me.tobi.FloatingIslands.Listeners.PlayerRespawnListener;
 
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.WorldCreator;
 import org.bukkit.WorldType;
@@ -15,6 +16,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.Configuration;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 
 
@@ -78,13 +80,27 @@ public class FloatingIslands extends JavaPlugin{
 				if(sender instanceof Player){
 					Player player=(Player)sender;
 					if(player.getWorld()!=floatingIslandsWorld){
-						FloatingIslandsPlayerHandler ph=
-								new FloatingIslandsPlayerHandler(
-										player, this.getDataFolder());
-						ph.readFromPlayerFile();
-						Location fiSpawn=ph.getFloatingIslandsSpawn();
+						FloatingIslandsPlayerHandler ph=Util.deserializePlayerHandler(
+								this.getDataFolder(), player.getName());
+						if(ph==null){
+							ph=new FloatingIslandsPlayerHandler(this.getServer(),
+									player.getName());
+						}
+						else ph.setServer(this.getServer());
 						ph.setRegularSpawn(player.getLocation());
-						ph.saveToPlayerFile();
+						ph.setRegularInventory(player.getInventory());
+						Location fiSpawn=ph.getFloatingIslandsSpawn();
+						if(!ph.hasJoinedFloatingIslandsBefore()){
+							ItemStack []items=new ItemStack[3]; //TODO: read from config
+							items[0]=new ItemStack(Material.ICE, 1);
+							items[1]=new ItemStack(Material.LAVA_BUCKET);
+							items[2]=new ItemStack(Material.MELON_SEEDS);
+							player.getInventory().setContents(items);
+						}
+						else{
+							ph.fillFloatingIslandsInventory(player.getInventory());
+						}
+						Util.serializePlayerHandler(ph, this.getDataFolder());
 						if(fiSpawn!=null){
 							player.teleport(fiSpawn);
 						}
@@ -109,13 +125,18 @@ public class FloatingIslands extends JavaPlugin{
 					if(player.getWorld()==floatingIslandsWorld){
 						List<World> worlds=this.getServer().getWorlds();
 						if(worlds.size()>0){
-							FloatingIslandsPlayerHandler ph=
-									new FloatingIslandsPlayerHandler(
-											player, this.getDataFolder());
-							ph.readFromPlayerFile();
-							Location regularSpawn=ph.getRegularSpawn();
+							FloatingIslandsPlayerHandler ph=Util.deserializePlayerHandler(
+									this.getDataFolder(), player.getName());
+							if(ph==null){
+								ph=new FloatingIslandsPlayerHandler(this.getServer(),
+										player.getName());
+							}
+							else ph.setServer(this.getServer());
 							ph.setFloatingIslandsSpawn(player.getLocation());
-							ph.saveToPlayerFile();
+							ph.setFloatingIslandsInventory(player.getInventory());
+							Location regularSpawn=ph.getRegularSpawn();
+							ph.fillRegularInventory(player.getInventory());
+							Util.serializePlayerHandler(ph, this.getDataFolder());
 							if(regularSpawn!=null){
 								player.teleport(regularSpawn);
 							}
