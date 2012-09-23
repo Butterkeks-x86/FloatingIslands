@@ -2,7 +2,6 @@ package me.tobi.FloatingIslands;
 
 
 import java.io.File;
-import java.io.IOException;
 import java.util.List;
 
 import me.tobi.FloatingIslands.Listeners.PlayerRespawnListener;
@@ -14,7 +13,6 @@ import org.bukkit.WorldCreator;
 import org.bukkit.WorldType;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
-import org.bukkit.configuration.Configuration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -35,7 +33,7 @@ public class FloatingIslands extends JavaPlugin{
 			if(!created) this.getLogger().warning("Unable to create plugin data folder!");
 		}
 		if(!new File(this.getConfig().getCurrentPath()).exists()){
-			createDefaultConfigFile();
+			this.saveDefaultConfig();
 		}
 		
 		/*load and parse configuratiion parameters*/
@@ -167,21 +165,5 @@ public class FloatingIslands extends JavaPlugin{
 		}
 		//unknwon command, not interpreted by this plugin
 		else return false;
-	}
-	
-	/**
-	 * TODO: this doesn't work
-	 */
-	private void createDefaultConfigFile(){
-		Configuration defaults=this.getConfig().getDefaults();
-		if(defaults!=null){
-			this.getConfig().setDefaults(defaults);
-			try {
-				this.getConfig().save(this.getDataFolder().getAbsolutePath()+"/config.yml");
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-		else this.getLogger().warning("Unable to save default config file!");
 	}
 }
