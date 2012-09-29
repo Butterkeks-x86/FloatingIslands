@@ -1,10 +1,9 @@
-package me.tobi.FloatingIslands;
+package com.git.butterkeks_x86.floatingIslands;
 
 
 import java.io.File;
 import java.util.List;
 
-import me.tobi.FloatingIslands.Listeners.PlayerRespawnListener;
 
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -14,6 +13,8 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import com.git.butterkeks_x86.floatingIslands.listeners.PlayerRespawnListener;
 
 
 public class FloatingIslands extends JavaPlugin{

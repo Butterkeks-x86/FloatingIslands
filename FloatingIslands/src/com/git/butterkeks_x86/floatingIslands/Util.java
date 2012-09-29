@@ -1,4 +1,4 @@
-package me.tobi.FloatingIslands;
+package com.git.butterkeks_x86.floatingIslands;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
