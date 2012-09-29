@@ -1,4 +1,4 @@
-package com.git.butterkeks_x86.floatingIslands.listeners;
+package com.github.butterkeks_x86.floatingIslands.listeners;
 
 import org.bukkit.World;
 import org.bukkit.entity.Player;

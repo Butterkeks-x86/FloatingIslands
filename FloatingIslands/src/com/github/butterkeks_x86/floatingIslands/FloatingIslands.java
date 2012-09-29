@@ -1,4 +1,4 @@
-package com.git.butterkeks_x86.floatingIslands;
+package com.github.butterkeks_x86.floatingIslands;
 
 
 import java.io.File;
@@ -14,7 +14,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import com.git.butterkeks_x86.floatingIslands.listeners.PlayerRespawnListener;
+import com.github.butterkeks_x86.floatingIslands.listeners.PlayerRespawnListener;
 
 
 public class FloatingIslands extends JavaPlugin{

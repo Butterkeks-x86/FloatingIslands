@@ -1,4 +1,4 @@
-package com.git.butterkeks_x86.floatingIslands;
+package com.github.butterkeks_x86.floatingIslands;
 
 import java.util.ArrayList;
 import java.util.List;
