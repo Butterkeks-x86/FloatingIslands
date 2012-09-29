@@ -7,14 +7,12 @@ import java.util.List;
 import me.tobi.FloatingIslands.Listeners.PlayerRespawnListener;
 
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.WorldCreator;
 import org.bukkit.WorldType;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 
 
@@ -46,7 +44,10 @@ public class FloatingIslands extends JavaPlugin{
 		wc.environment(World.Environment.NORMAL);
 		wc.generateStructures(config.generateStructures);
 		wc.generator(new FloatingIslandsChunkGenerator(config));
-		//TODO: seed?
+		List<World> worlds=this.getServer().getWorlds();
+		if(!worlds.isEmpty() && worlds.get(0)!=null){
+			wc.seed(worlds.get(0).getSeed());
+		}
 		wc.type(WorldType.NORMAL);
 		floatingIslandsWorld=getServer().createWorld(wc);
 		Util.ensureValidSpawn(floatingIslandsWorld, this.getDataFolder(), config);
@@ -89,11 +90,8 @@ public class FloatingIslands extends JavaPlugin{
 						ph.setRegularInventory(player.getInventory());
 						Location fiSpawn=ph.getFloatingIslandsSpawn();
 						if(!ph.hasJoinedFloatingIslandsBefore()){
-							ItemStack []items=new ItemStack[3]; //TODO: read from config
-							items[0]=new ItemStack(Material.ICE, 1);
-							items[1]=new ItemStack(Material.LAVA_BUCKET);
-							items[2]=new ItemStack(Material.MELON_SEEDS);
-							player.getInventory().setContents(items);
+							player.getInventory().setContents(config.startItems);
+							ph.setFloatingIslandJoined(true);
 						}
 						else{
 							ph.fillFloatingIslandsInventory(player.getInventory());

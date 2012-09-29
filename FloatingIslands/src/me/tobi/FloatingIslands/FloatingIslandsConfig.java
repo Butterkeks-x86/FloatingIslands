@@ -1,6 +1,8 @@
 package me.tobi.FloatingIslands;
 
+import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.inventory.ItemStack;
 
 
 /**
@@ -21,6 +23,7 @@ public class FloatingIslandsConfig {
 	public int level1MaxGenHeight=127;
 	public double level1GenProbability=0.1;
 	public boolean generateStructures=true;
+	public ItemStack []startItems=new ItemStack[5];
 	
 	/**
 	 * Constructor.
@@ -28,19 +31,72 @@ public class FloatingIslandsConfig {
 	 */
 	public FloatingIslandsConfig(FileConfiguration config){
 		this.fileConfig=config;
+		//standard start items: ice block, lava bucket, melon seed, bone
+		startItems[0]=new ItemStack(Material.ICE, 1);
+		startItems[1]=new ItemStack(Material.LAVA_BUCKET, 1);
+		startItems[2]=new ItemStack(Material.MELON_SEEDS, 1);
+		startItems[3]=new ItemStack(Material.BONE, 1);
 	}
 	
 	/**
 	 * Parses the values from FileConfiguration object to variables.
+	 * If a option does not exists, it will be used a own default value
+	 * instead of bukkit default values (no zeroes etc.)
 	 */
 	public void parse(){
-		level0MaxGenHeight=fileConfig.getInt("level0-max-gen-height");
-		level0MinGenHeight=fileConfig.getInt("level0-min-gen-height");
-		level0GenProbability=fileConfig.getDouble("level0-gen-probability");
-		level1MaxGenHeight=fileConfig.getInt("level1-max-gen-height");
-		level1MinGenHeight=fileConfig.getInt("level1-min-gen-height");
-		level1GenProbability=fileConfig.getDouble("level1-gen-probability");
+		int intTmp=0;
+		double doubleTmp=0;
+		ItemStack itemTmp=null;
+		
+		//level0 generation params
+		intTmp=fileConfig.getInt("level0-max-gen-height");
+		if(intTmp!=0){
+			level0MaxGenHeight=intTmp;
+		}
+		intTmp=fileConfig.getInt("level0-min-gen-height");
+		if(intTmp!=0){
+			level0MinGenHeight=intTmp;
+		}
+		doubleTmp=fileConfig.getDouble("level0-gen-probability");
+		if(doubleTmp!=0){
+			level0GenProbability=doubleTmp;
+		}
+		//level1 generation params
+		intTmp=fileConfig.getInt("level1-max-gen-height");
+		if(intTmp!=0){
+			level1MaxGenHeight=intTmp;
+		}
+		intTmp=fileConfig.getInt("level1-min-gen-height");
+		if(intTmp!=0){
+			level1MinGenHeight=intTmp;
+		}
+		doubleTmp=fileConfig.getDouble("level1-gen-probability");
+		if(doubleTmp!=0){
+			level1GenProbability=doubleTmp;
+		}
+		//generate structures
 		generateStructures=fileConfig.getBoolean("generate-structures");
+		//start items
+		itemTmp=fileConfig.getItemStack("startItems.one");
+		if(itemTmp!=null){
+			startItems[0]=itemTmp;
+		}
+		itemTmp=fileConfig.getItemStack("startItems.two");
+		if(itemTmp!=null){
+			startItems[1]=itemTmp;
+		}
+		itemTmp=fileConfig.getItemStack("startItems.three");
+		if(itemTmp!=null){
+			startItems[2]=itemTmp;
+		}
+		itemTmp=fileConfig.getItemStack("startItems.four");
+		if(itemTmp!=null){
+			startItems[3]=itemTmp;
+		}
+		itemTmp=fileConfig.getItemStack("startItems.five");
+		if(itemTmp!=null){
+			startItems[4]=itemTmp;
+		}
 	}
 	
 	/**
