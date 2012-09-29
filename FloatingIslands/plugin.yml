@@ -1,6 +1,6 @@
 name: FloatingIslands
-main: me.tobi.FloatingIslands.FloatingIslands
-version: 0.1
+main: com.github.butterkeks_x86.floatingIslands.FloatingIslands
+version: 1.0
 commands:
   floatingIslands:
     description: Join or leave the FloatingIslands realm
