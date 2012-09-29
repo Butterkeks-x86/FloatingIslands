@@ -1,1 +1,0 @@
-Make sure to set property spawn-radius in bukkit.yml to 0! 
