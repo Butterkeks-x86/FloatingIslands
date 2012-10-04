@@ -1,6 +1,6 @@
 name: FloatingIslands
 main: com.github.butterkeks_x86.floatingIslands.FloatingIslands
-version: 1.0
+version: beta1.1
 commands:
   floatingIslands:
     description: Join or leave the FloatingIslands realm

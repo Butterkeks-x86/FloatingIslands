@@ -27,7 +27,7 @@ import com.github.butterkeks_x86.floatingIslands.listeners.PlayerRespawnListener
 
 public class FloatingIslands extends JavaPlugin{
 	
-	public static final String VERSION="0.1";
+	public static final String VERSION="beta1.1";
 	private FloatingIslandsConfig config;
 	private World floatingIslandsWorld;
 	
@@ -88,10 +88,10 @@ public class FloatingIslands extends JavaPlugin{
 				if(sender instanceof Player){
 					Player player=(Player)sender;
 					if(player.getWorld()!=floatingIslandsWorld){
-						FloatingIslandsPlayerHandler ph=Util.deserializePlayerHandler(
+						PlayerHandler ph=Util.deserializePlayerHandler(
 								this.getDataFolder(), player.getName());
 						if(ph==null){
-							ph=new FloatingIslandsPlayerHandler(this.getServer(),
+							ph=new PlayerHandler(this.getServer(),
 									player.getName());
 						}
 						else ph.setServer(this.getServer());
@@ -130,10 +130,10 @@ public class FloatingIslands extends JavaPlugin{
 					if(player.getWorld()==floatingIslandsWorld){
 						List<World> worlds=this.getServer().getWorlds();
 						if(worlds.size()>0){
-							FloatingIslandsPlayerHandler ph=Util.deserializePlayerHandler(
+							PlayerHandler ph=Util.deserializePlayerHandler(
 									this.getDataFolder(), player.getName());
 							if(ph==null){
-								ph=new FloatingIslandsPlayerHandler(this.getServer(),
+								ph=new PlayerHandler(this.getServer(),
 										player.getName());
 							}
 							else ph.setServer(this.getServer());

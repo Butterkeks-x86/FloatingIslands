@@ -25,7 +25,7 @@ import org.bukkit.inventory.ItemStack;
  * property after deserialization since it is transient!
  *
  */
-public class FloatingIslandsPlayerHandler implements Serializable{
+public class PlayerHandler implements Serializable{
 	
 	public static final long serialVersionUID=1L;
 	
@@ -44,7 +44,7 @@ public class FloatingIslandsPlayerHandler implements Serializable{
 	 * @param server The correspondent Minecraft server object
 	 * @param playerName The name of the player (via player.getName())
 	 */
-	public FloatingIslandsPlayerHandler(Server server, String playerName){
+	public PlayerHandler(Server server, String playerName){
 		this.playerName=playerName;
 		this.server=server;
 	}

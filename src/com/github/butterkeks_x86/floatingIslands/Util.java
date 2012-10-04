@@ -275,7 +275,7 @@ public class Util {
 	 * @param ph The PlayerHandler to serialize
 	 * @param dataFolder the FloatingIslandsPlugin data folder
 	 */
-	public static void serializePlayerHandler(FloatingIslandsPlayerHandler ph,
+	public static void serializePlayerHandler(PlayerHandler ph,
 			File dataFolder){
 		if(ph==null) return;
 		ObjectOutputStream oout=null;
@@ -307,7 +307,7 @@ public class Util {
 	 * @param playerName the name of the player whose Playerhandler is searched
 	 * @return the requested PlayerHandler or null, if file or object in file not found
 	 */
-	public static FloatingIslandsPlayerHandler deserializePlayerHandler(File dataFolder,
+	public static PlayerHandler deserializePlayerHandler(File dataFolder,
 			String playerName){
 		//first, proove that file exists
 		File playerFile=new File(dataFolder.getAbsolutePath()+"/"+playerName);
@@ -334,8 +334,8 @@ public class Util {
 			}
 		}
 		//perform simple validation
-		if(((FloatingIslandsPlayerHandler)ret).getPlayerName().equalsIgnoreCase(playerName)){
-			return (FloatingIslandsPlayerHandler)ret;
+		if(((PlayerHandler)ret).getPlayerName().equalsIgnoreCase(playerName)){
+			return (PlayerHandler)ret;
 		}
 		else return null;
 	}
