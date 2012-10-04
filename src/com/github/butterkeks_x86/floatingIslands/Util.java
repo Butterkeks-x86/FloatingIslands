@@ -26,6 +26,7 @@ import org.bukkit.World;
 import org.bukkit.block.Biome;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.inventory.ItemStack;
 
 public class Util {
 	
@@ -338,5 +339,45 @@ public class Util {
 			return (PlayerHandler)ret;
 		}
 		else return null;
+	}
+	
+	/**
+	 * Converts a String in an item stack. The format of the String is:
+	 *     <type>.<data>:<amount>
+	 * The first parameter is nessecary, the last ones may be omitted.
+	 * @param s The String to parse
+	 * @return The coded item stack or null, if malformed input
+	 */
+	public static ItemStack getItemStackFromString(String s){
+		
+		if(s.trim().isEmpty()) return null;
+		
+		int dotIndex=s.indexOf(".");
+		int colIndex=s.indexOf(":");
+		
+		try {
+			if(dotIndex>0 && colIndex>0){ //data and amount given
+				int type=Integer.parseInt(s.substring(0, dotIndex));
+				byte data=(byte)Integer.parseInt(s.substring(dotIndex, colIndex));
+				int amount=Integer.parseInt(s.substring(colIndex));
+				return new ItemStack(type, amount, (short)0, data);
+			}
+			else if(colIndex>0){ //only amount given -> no data
+				int type=Integer.parseInt(s.substring(0, colIndex));
+				int amount=Integer.parseInt(s.substring(colIndex));
+				return new ItemStack(type, amount);
+			}
+			else if(dotIndex>0){ //only data given -> amount=1
+				int type=Integer.parseInt(s.substring(0, dotIndex));
+				byte data=(byte)Integer.parseInt(s.substring(dotIndex));
+				return new ItemStack(type, 1, (short)0, data);
+			}
+			else{ //only type given -> amount=1, no data
+				return new ItemStack(Integer.parseInt(s));
+			}
+		} catch (NumberFormatException e) {
+			System.out.println("Ignored malformed item stack \""+s+"\".");
+			return null;
+		}
 	}
 }

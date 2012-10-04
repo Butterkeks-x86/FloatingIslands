@@ -5,9 +5,4 @@ level1-max-gen-height: 72
 level1-min-gen-height: 56
 level1-gen-probability: 0.3
 generate-structures: true
-startItems:
-  one:
-  two:
-  three:
-  four:
-  five:
+startItems: 79.0:1 326:1 362.0 352 

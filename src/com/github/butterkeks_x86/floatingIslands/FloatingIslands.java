@@ -99,7 +99,7 @@ public class FloatingIslands extends JavaPlugin{
 						ph.setRegularInventory(player.getInventory());
 						Location fiSpawn=ph.getFloatingIslandsSpawn();
 						if(!ph.hasJoinedFloatingIslandsBefore()){
-							player.getInventory().setContents(config.startItems);
+							player.getInventory().setContents(config.getStartItems());
 							ph.setFloatingIslandJoined(true);
 						}
 						else{

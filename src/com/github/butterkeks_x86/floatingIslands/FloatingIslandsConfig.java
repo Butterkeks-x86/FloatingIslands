@@ -8,6 +8,8 @@
 
 package com.github.butterkeks_x86.floatingIslands;
 
+import java.util.ArrayList;
+
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.inventory.ItemStack;
@@ -17,7 +19,8 @@ import org.bukkit.inventory.ItemStack;
  * Parses and holds the configuration of the floating islands plugin
  * to keep it simple.
  * All members are properly initialized, even if not found in the configuration,
- * and public accessible.
+ * or queried before parsed from it.
+ * All members are public accessible except the start items.
  * 
  */
 public class FloatingIslandsConfig {
@@ -31,7 +34,7 @@ public class FloatingIslandsConfig {
 	public int level1MaxGenHeight=127;
 	public double level1GenProbability=0.1;
 	public boolean generateStructures=true;
-	public ItemStack []startItems=new ItemStack[5];
+	private ArrayList<ItemStack> startItems=null;
 	
 	/**
 	 * Constructor.
@@ -39,11 +42,26 @@ public class FloatingIslandsConfig {
 	 */
 	public FloatingIslandsConfig(FileConfiguration config){
 		this.fileConfig=config;
-		//standard start items: ice block, lava bucket, melon seed, bone
-		startItems[0]=new ItemStack(Material.ICE, 1);
-		startItems[1]=new ItemStack(Material.LAVA_BUCKET, 1);
-		startItems[2]=new ItemStack(Material.MELON_SEEDS, 1);
-		startItems[3]=new ItemStack(Material.BONE, 1);
+	}
+	
+	/**
+	 * Gets the start items. Used getter here instead of public field for proper
+	 * default values.
+	 * @return The start items as described in the config or standard start items.
+	 */
+	public ItemStack[] getStartItems(){
+		if(startItems!=null && startItems.size()>0){
+			return startItems.toArray(new ItemStack[startItems.size()]);
+		}
+		else{
+			startItems=new ArrayList<ItemStack>(4);
+			//standard start items: ice block, lava bucket, melon seed, bone
+			startItems.add(new ItemStack(Material.ICE, 1));
+			startItems.add(new ItemStack(Material.LAVA_BUCKET, 1));
+			startItems.add(new ItemStack(Material.MELON_SEEDS, 1));
+			startItems.add(new ItemStack(Material.BONE, 1));
+			return startItems.toArray(new ItemStack[4]);
+		}
 	}
 	
 	/**
@@ -54,7 +72,6 @@ public class FloatingIslandsConfig {
 	public void parse(){
 		int intTmp=0;
 		double doubleTmp=0;
-		ItemStack itemTmp=null;
 		
 		//level0 generation params
 		intTmp=fileConfig.getInt("level0-max-gen-height");
@@ -85,25 +102,13 @@ public class FloatingIslandsConfig {
 		//generate structures
 		generateStructures=fileConfig.getBoolean("generate-structures");
 		//start items
-		itemTmp=fileConfig.getItemStack("startItems.one");
-		if(itemTmp!=null){
-			startItems[0]=itemTmp;
-		}
-		itemTmp=fileConfig.getItemStack("startItems.two");
-		if(itemTmp!=null){
-			startItems[1]=itemTmp;
-		}
-		itemTmp=fileConfig.getItemStack("startItems.three");
-		if(itemTmp!=null){
-			startItems[2]=itemTmp;
-		}
-		itemTmp=fileConfig.getItemStack("startItems.four");
-		if(itemTmp!=null){
-			startItems[3]=itemTmp;
-		}
-		itemTmp=fileConfig.getItemStack("startItems.five");
-		if(itemTmp!=null){
-			startItems[4]=itemTmp;
+		String startItemsStr=fileConfig.getString("start-items");
+		if(startItemsStr!=null && startItemsStr.length()>0){
+			String []tokens=startItemsStr.split(" ");
+			startItems=new ArrayList<ItemStack>();
+			for(String token : tokens){
+				startItems.add(Util.getItemStackFromString(token));
+			}
 		}
 	}
 	

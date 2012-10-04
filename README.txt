@@ -3,15 +3,22 @@ FloatingIslands Minecraft Bukkit Server Plugin
 This is a plugin that generates a fourth world alongside the Overworld,
 the Nether and the End. This world consists solely of tiny islands of dirt
 or stone with trees, tall grass, reeds, pumkins and much more...
-This plugin is inspired by the SkyblockSurvival, you start with a bucket
-of lava, a ice block, a melon seed and one bone to build a cobble generator
-first. This allows you to make it over to other islands and gain their
-ressources. Use water scaffolding to get down to the valuable stone islands
-with redstone and diamond ores.
+This plugin is inspired by the SkyblockSurvival, you start with a little set
+of items to build a cobble generator first. This allows you to make it over
+to other islands and gain their ressources. Use water scaffolding to get
+down to the valuable stone islands with redstone and diamond ores.
 
 Installation:
-	Simply put FloatingIslands.jar in Bukkits plugin folder and restart
+	Simply put FloatingIslands.jar in Bukkit's plugin folder and restart
 	your server.
+
+Commands:
+	/floatingIslands join - join the FloatingIslands realm. Your inventory
+	will be toggled for your FloatingIslands inventory. If never joined
+	before, you will get a set of start items (see config).
+	
+	/floatingIslands leave - leave the FloatingIslands realm. Your inventory
+	will be toggled for your default inventory.
 
 Configuration:
 	level0-min-gen-height and level0-max-gen-height control the generation
@@ -20,9 +27,16 @@ Configuration:
 	The same parameters exist for level1, for the main dirt islands.
 	generateStructures is unimplemented up to now and unused therefore.
 	startItems are the items a player receives upon first join in the
-	FloatingIslands realm.
+	FloatingIslands realm. Provide them in following manner:
+		<type>.<data>:<amount>
+	The item type (item id) hast to be provided, the data value and amount
+	are optional. Default amount is 1, default data is none. For item and
+	data values, refer to the Minecraft Wiki:
+		http://www.minecraftwiki.net/wiki/Data_Value
+	A set of default start items is provided by the standard conf.yml
+	of this plugin.
 
 Permissions:
 	FloatingIslands.join - unimplemented up to now.
 
-2012-9-29
+2012-10-4 Butterkeks-x86
