@@ -13,6 +13,8 @@ Installation:
 	your server.
 
 Commands:
+	/floatingIslands help - displays a help message.
+
 	/floatingIslands join - join the FloatingIslands realm. Your inventory
 	will be toggled for your FloatingIslands inventory. If never joined
 	before, you will get a set of start items (see config).
@@ -37,6 +39,10 @@ Configuration:
 	of this plugin.
 
 Permissions:
-	FloatingIslands.join - unimplemented up to now.
+	floatingIslands.* - Acces to all FloatingIsland commands.
+	floatingIslands.join - Allows a player or group to join the
+		FloatingIslands relam.
+	floatingIslands.leave - Allows a player or group to leave
+		the FloatingIslands realm.
 
-2012-10-4 Butterkeks-x86
+2012-10-6 Butterkeks-x86
