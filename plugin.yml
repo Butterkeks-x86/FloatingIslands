@@ -1,9 +1,10 @@
 name: FloatingIslands
 main: com.github.butterkeks_x86.floatingIslands.FloatingIslands
-version: beta1.1
+version: 1.2beta
+author: Butterkeks-x86 @Github
+website: www.github.com/Butterkeks-x86/FloatingIslands
 commands:
   floatingIslands:
-    description: Join or leave the FloatingIslands realm
-    usage: /floatingIslands join to enter the floating islands realm and /floatingIslands leave to leave it
-    permissions: FloatingIslands.join
-    permission-message: You don't have the permission to join the FloaringIslands realm
+    description: Join or leave the FloatingIslands realm.
+    usage: "Usage: /<command> [help | join | leave]"
+    aliases: [fi]
