@@ -27,7 +27,7 @@ import com.github.butterkeks_x86.floatingIslands.listeners.PlayerRespawnListener
 
 public class FloatingIslands extends JavaPlugin{
 	
-	public static final String VERSION="beta1.1";
+	public static final String VERSION="1.2beta";
 	private FloatingIslandsConfig config;
 	private World floatingIslandsWorld;
 	
@@ -79,43 +79,61 @@ public class FloatingIslands extends JavaPlugin{
 		//floating islands plugin commands
 		if(cmd.getName().equalsIgnoreCase("floatingIslands")){
 			//check for correct number of arguments
-			if(args.length==0 || args.length>1){
-				sender.sendMessage("Invalid number of arguments.");
-				return false;
+			if(args.length==0){
+				sender.sendMessage("Too few arguments.");
+				return false; //will display usage from plugin.yml
+			}
+			else if(args.length>1){
+				sender.sendMessage("Too many arguments.");
+				return false; //will display usage from plugin.yml
+			}
+			//check for help message
+			else if(args[0].equalsIgnoreCase("help")){
+				sender.sendMessage("\nFloatingIslands version "+VERSION+"\n"+
+						"/floatingIslands help - displays short info of this command\n"+
+						"/floatingIslands join - join the FloatingIslands realm\n"+
+						"/floatingIslands leave - leave the FloatingIslands realm");
+				return true;
 			}
 			//check for join option
-			if(args[0].equalsIgnoreCase("join")){
+			else if(args[0].equalsIgnoreCase("join")){
 				if(sender instanceof Player){
 					Player player=(Player)sender;
-					if(player.getWorld()!=floatingIslandsWorld){
-						PlayerHandler ph=Util.deserializePlayerHandler(
-								this.getDataFolder(), player.getName());
-						if(ph==null){
-							ph=new PlayerHandler(this.getServer(),
-									player.getName());
-						}
-						else ph.setServer(this.getServer());
-						ph.setRegularSpawn(player.getLocation());
-						ph.setRegularInventory(player.getInventory());
-						Location fiSpawn=ph.getFloatingIslandsSpawn();
-						if(!ph.hasJoinedFloatingIslandsBefore()){
-							player.getInventory().setContents(config.getStartItems());
-							ph.setFloatingIslandJoined(true);
+					if(player.hasPermission("floatingIslands.join")){
+						if(player.getWorld()!=floatingIslandsWorld){
+							PlayerHandler ph=Util.deserializePlayerHandler(
+									this.getDataFolder(), player.getName());
+							if(ph==null){
+								ph=new PlayerHandler(this.getServer(),
+										player.getName());
+							}
+							else ph.setServer(this.getServer());
+							ph.setRegularSpawn(player.getLocation());
+							ph.setRegularInventory(player.getInventory());
+							Location fiSpawn=ph.getFloatingIslandsSpawn();
+							if(!ph.hasJoinedFloatingIslandsBefore()){
+								player.getInventory().setContents(config.getStartItems());
+								ph.setFloatingIslandJoined(true);
+							}
+							else{
+								ph.fillFloatingIslandsInventory(player.getInventory());
+							}
+							Util.serializePlayerHandler(ph, this.getDataFolder());
+							if(fiSpawn!=null){
+								player.teleport(fiSpawn);
+							}
+							else{
+								player.teleport(floatingIslandsWorld.getSpawnLocation());
+							}
 						}
 						else{
-							ph.fillFloatingIslandsInventory(player.getInventory());
-						}
-						Util.serializePlayerHandler(ph, this.getDataFolder());
-						if(fiSpawn!=null){
-							player.teleport(fiSpawn);
-						}
-						else{
-							player.teleport(floatingIslandsWorld.getSpawnLocation());
+							player.sendMessage("You are already in the " +
+									"FloatingIslands realm.");
 						}
 					}
 					else{
-						player.sendMessage("You are already in the " +
-								"FloatingIslands realm.");
+						player.sendMessage("You are not allowed to join the" +
+								" FloatingIslands realm!");
 					}
 				}
 				else{
@@ -127,36 +145,42 @@ public class FloatingIslands extends JavaPlugin{
 			else if(args[0].equalsIgnoreCase("leave")){
 				if(sender instanceof Player){
 					Player player=(Player)sender;
-					if(player.getWorld()==floatingIslandsWorld){
-						List<World> worlds=this.getServer().getWorlds();
-						if(worlds.size()>0){
-							PlayerHandler ph=Util.deserializePlayerHandler(
-									this.getDataFolder(), player.getName());
-							if(ph==null){
-								ph=new PlayerHandler(this.getServer(),
-										player.getName());
-							}
-							else ph.setServer(this.getServer());
-							ph.setFloatingIslandsSpawn(player.getLocation());
-							ph.setFloatingIslandsInventory(player.getInventory());
-							Location regularSpawn=ph.getRegularSpawn();
-							ph.fillRegularInventory(player.getInventory());
-							Util.serializePlayerHandler(ph, this.getDataFolder());
-							if(regularSpawn!=null){
-								player.teleport(regularSpawn);
+					if(player.hasPermission("floatingIslands.leave")){
+						if(player.getWorld()==floatingIslandsWorld){
+							List<World> worlds=this.getServer().getWorlds();
+							if(worlds.size()>0){
+								PlayerHandler ph=Util.deserializePlayerHandler(
+										this.getDataFolder(), player.getName());
+								if(ph==null){
+									ph=new PlayerHandler(this.getServer(),
+											player.getName());
+								}
+								else ph.setServer(this.getServer());
+								ph.setFloatingIslandsSpawn(player.getLocation());
+								ph.setFloatingIslandsInventory(player.getInventory());
+								Location regularSpawn=ph.getRegularSpawn();
+								ph.fillRegularInventory(player.getInventory());
+								Util.serializePlayerHandler(ph, this.getDataFolder());
+								if(regularSpawn!=null){
+									player.teleport(regularSpawn);
+								}
+								else{
+									player.teleport(worlds.get(0).getSpawnLocation());
+								}
 							}
 							else{
-								player.teleport(worlds.get(0).getSpawnLocation());
+								player.sendMessage("Unable to find regular world."
+										+"Abort.");
 							}
 						}
 						else{
-							player.sendMessage("Unable to find regular world."
-									+"Abort.");
+							player.sendMessage("You are not in the " +
+									"FloatingIslands realm, so you can't leave.");
 						}
 					}
 					else{
-						player.sendMessage("You are not in the " +
-								"FloatingIslands realm, so you can't leave.");
+						player.sendMessage("You are not allowed to leave the"+
+								" FloatingIslands realm!");
 					}
 				}
 				else{
@@ -167,7 +191,7 @@ public class FloatingIslands extends JavaPlugin{
 			//invalid option
 			else{
 				sender.sendMessage("Unknown option \""+args[0]+"\".");
-				return false;
+				return false; //will display usage from plugin.yml
 			}
 		}
 		//unknwon command, not interpreted by this plugin
